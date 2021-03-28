@@ -1,0 +1,1 @@
+const cagata = 10;
