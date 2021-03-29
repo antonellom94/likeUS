@@ -2,16 +2,19 @@
   "name": "server",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node index.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cookie-session": "^1.4.0",
     "express": "^4.17.1",
+    "oauth": "^0.9.15",
     "passport": "^0.4.1",
-    "passport-twitter": "^1.0.4"
+    "passport-twitter": "^1.0.4",
+    "sys": "^0.0.1"
   }
 }
