@@ -5,77 +5,62 @@ const keys = require("../config/keys");
 const credentials = `${keys.twitterAPIKey}:${keys.twitterAPISecretKey}`;
 const credentialsBase64Encoded = new Buffer(credentials).toString("base64");
 
+const oauth_callback = "http:localhost:3000/auth/twitter/callback";
+const consumer_key = keys.twitterAPIKey;
+
 var app = express();
 
-app.get("/", function (req, res) {
-  res.send(
-    "code: " +
-      req.query.code +
-      "<br><br><button onclick='window.location.href=\"/token\"'>Get Token</button>"
-  );
-  code = req.query.code;
-});
-
-// redirect to twitter login
-app.get("/connect", function (req, res) {
-  request(
-    {
-      url:
-        "https://api.twitter.com/oauth/authenticate?oauth_token=" +
-        keys.twitterAccessToken,
-      method: "POST",
-      headers: {
-        Authorization: `Basic ${credentialsBase64Encoded}`,
-        "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
-      },
-      body: "grant_type=client_credentials",
-    },
-    function (err, resp, body) {
-      res.send(body);
-    }
-  );
-});
-
-// Obtain a bearer token
-app.get("/token", function (req, res) {
+app.get("/auth/twitter/callback", function (req, res) {
   request(
     {
       url: "https://api.twitter.com/oauth2/token",
       method: "POST",
       headers: {
-        Authorization: `Basic ${credentialsBase64Encoded}`,
-        "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+        authorization: "Basic " + credentialsBase64Encoded,
+        "cache-control": "no-cache",
+        "content-type": "application/x-www-form-urlencoded",
+        "postman-token": "ad20d936-a9b9-2766-d5bb-e201f5a45884",
       },
       body: "grant_type=client_credentials",
     },
-    function (err, resp, body) {
-      var obj = JSON.parse(body);
-      var token = obj.access_token;
-      res.send(token);
+    function (error, response) {
+      console.log(response.statusCode);
+      res.send(JSON.parse(response.body));
     }
   );
 });
 
-// login view
-app.get("/login", function (req, res) {
+app.get("/auth/twitter/api", function (req, res) {
   request(
     {
       url:
         "https://api.twitter.com/1.1/statuses/user_timeline.json?count=1&screen_name=twitterapi",
+      method: "GET",
       headers: {
-        Authorization:
-          "Bearer AAAAAAAAAAAAAAAAAAAAAIBnOAEAAAAAWEVBIJVyzs%2F43h%2F7NbI55Oz2kI8%3DLDN3FCllZAb20Ll5tGPjSuPzYmIxxC3ymU2IWnlVbj1crlSpEj",
+        authorization: "Bearer " + keys.twitterAPIBearerToken,
       },
     },
-    function (error, response, body) {
-      var obj = JSON.parse(body);
-      res.send(obj);
+    function (err, response) {
+      console.log(response.statusCode);
+      res.send(JSON.parse(response.body));
+    }
+  );
+});
+
+app.get("/auth/twitter", function (req, res) {
+  request(
+    {
+      url: "https://api.twitter.com/oauth/authorize",
+      method: "GET",
+      headers: {
+        oauth_token: keys.twitterAPIBearerToken,
+      },
+    },
+    function (err, response) {
+      console.log(response.statusCode);
+      res.send(response.body);
     }
   );
 });
 
 app.listen(3000);
-
-app.get("/connect", function (req, res) {
-  request;
-});
