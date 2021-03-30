@@ -1,7 +1,7 @@
 var express = require('express');
-var axios = require('axios').default;
+//var axios = require('axios').default;
 var request = require('request');
-var qs = require('querystring');
+//var qs = require('querystring');
 const keys = require("../config/keys")
 
 var app = express();
@@ -11,9 +11,9 @@ app.use(express.urlencoded({ extended: false }));
 port = 3000;
 client_id = keys.googleClientID;
 client_secret = keys.googleClientSecret;
-red_uri="http://localhost:3000/&response_type=code";
+red_uri = "http://localhost:3000/&response_type=code";
+red_uri_post = "http%3A%2F%2Flocalhost%3A3000%2F&response_type=code";
 code = "";
-token = "";
 
 var scope = "https://www.googleapis.com/auth/calendar";
 var getCode = "https://accounts.google.com/o/oauth2/auth?client_id="+client_id+"&scope="+scope+"&approval_prompt=force&redirect_uri="+red_uri;
@@ -26,26 +26,7 @@ app.get('/login', function(req, res){
 app.get('/', function(req, res) {
   code = req.query.code;
   var info = "Il codice è: " + code;
-
-  var formData = {
-    code: code,
-    client_id: client_id,
-    client_secret: client_secret,
-    redirect_uri: red_uri,
-    grant_type: 'authorization_code'
-  }
-
-  request.post({url: "https://accounts.google.com/oauth2/v3/token", form: formData}, function optionalCallback(err, httpResponse, body) {
-    if (err) {
-      return console.error('upload failed:', err);
-    }
-    console.log('Upload successful!  Server responded with:', body);
-    var info = JSON.parse(body);
-    res.send("Got the token "+ info.access_token);
-    a_t= info.access_token;a_t = info.access_token;
-  });
-
-  //res.send(info + "<br><button onclick='window.location.href=\"/token\"'>Token</button>");
+  res.send(info + "<br><button onclick='window.location.href=\"/token\"'>Token</button>");
 });
 
 app.get('/token', function(req, res){
@@ -58,14 +39,14 @@ app.get('/token', function(req, res){
     grant_type: 'authorization_code'
   }
 
-  request.post({url: "https://accounts.google.com/oauth2/v3/token", form: formData}, function optionalCallback(err, httpResponse, body) {
+  request.post({url: "https://accounts.google.com/o/oauth2/token", form: formData}, function optionalCallback(err, httpResponse, body) {
     if (err) {
       return console.error('upload failed:', err);
     }
     console.log('Upload successful!  Server responded with:', body);
     var info = JSON.parse(body);
-    res.send("Got the token "+ info.access_token);
-    a_t= info.access_token;a_t = info.access_token;
+    a_t = info.access_token;
+    res.send("Got the token "+ a_t + "<br><button onclick='window.location.href=\"/token_info\"'>Get Token Info</button>");
   });
 /*  
   const data = { 'grant_type': 'client_credentials'};
@@ -91,7 +72,7 @@ app.get('/token', function(req, res){
 
 app.get('/token_info', function(req, res){
 	
-  var url = 'https://www.googleapis.com/oauth2/v1/tokeninfo?access_token='+token;
+  var url = 'https://www.googleapis.com/oauth2/v1/tokeninfo?access_token='+a_t;
 
 request.get({
   url:     url
