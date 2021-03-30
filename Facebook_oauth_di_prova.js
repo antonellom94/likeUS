@@ -27,7 +27,7 @@ prova1.get('/page', (req, res) => {
         axios.get('https://graph.facebook.com/v10.0/oauth/access_token?client_id='+process.env.APP_ID+
         '&client_secret='+process.env.SECRET+'&code='+req.query.code+
         '&redirect_uri='+request_uri)// il redirect_uri deve essere proprio il request_uri utilizzato nel passo precedente come redirect per permettere il login
-        .then(risposta_dio => res.send('this is you\'re token: '+req.query.code))//tutto a buon fine, manda il token al browser
+        .then(risposta_dio => res.send('this is you\'re token: '+ JSON.stringify(risposta_dio.data)))//tutto a buon fine, manda il token al browser
         .catch(err => console.log('errore: '+err));//c'è stato un errore stanpa l'errore
     }
     else{
