@@ -1,5 +1,11 @@
 ./server/config/**
 server/config/keys.js
+**/config/
+**/server/config/keys.js
+./config/*
+./config/*
+**/config/**
+**/config/
 ./node_modules/*
 ./node_modules/*
 **/node_modules/**
