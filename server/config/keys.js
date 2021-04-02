@@ -1,2 +1,4 @@
-const APP_ID = "250314690164908"
-const SECRET = "dee609c7c2ec6203f0b0228c79630002"
+module.exports = {
+    APP_ID : "250314690164908",
+    SECRET : "dee609c7c2ec6203f0b0228c79630002"
+}
