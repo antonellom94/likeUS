@@ -10,5 +10,5 @@ module.exports = {
 		twitterAccessToken: "3542365517-cUlWXHlrN8m4WWCxcvH4mOzd1yW1lYA9T1wbf3s",
 		twitterAccessSecret: "Ot2X0AuHTRwv6riadAOhTWywB0xTZxHZ5R8UKEn0CK5Uq",
 		cookieKey:
-	"jflsajfieoawjfepsjdf94375eouw4903ujlkjshdf0932jofisjdhlifj349075q9oijlrksafncnm",
+	"jflsajfieoawjfepsjdf94375eouw4903ujlkjshdf0932jofisjdhlifj349075q9oijlrksafncnm"
 }

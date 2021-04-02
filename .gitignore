@@ -1,12 +1,9 @@
 ./server/config/**
 server/config/keys.js
-<<<<<<< HEAD
 ./node_modules/*
 ./node_modules/*
-=======
 **/node_modules/**
 **/node_modules/
->>>>>>> 880f9bfbdf683de34790224cba67c6eea5cd04a2
 **/.DS_Store
 /.DS_Store
 .metals
