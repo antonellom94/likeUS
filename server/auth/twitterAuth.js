@@ -1,13 +1,21 @@
+/* --  IN STANDBY
+
 const request = require("request");
 const express = require("express");
 const keys = require("../config/keys");
-const { OAuth } = require("oauth");
 
 const credentials = `${keys.twitterAPIKey}:${keys.twitterAPISecretKey}`;
 const credentialsBase64Encoded = new Buffer(credentials).toString("base64");
 
 const oauth_callback = "http:localhost:3000/auth/twitter/callback";
 const consumer_key = keys.twitterAPIKey;
+const consumer_secret = keys.twitterAPISecretKey;
+const oauth_token = keys.twitterAccessToken;
+const oauth_secret = keys.twitterAccessSecret;
+const bearer_token = keys.twitterAPIBearerToken;
+const oauth_nonce = new Buffer(
+  "jdiaosjfelmwnclsejo4j35kwnekfnrsek5j34543F"
+).toString("base64");
 
 var app = express();
 
@@ -15,10 +23,15 @@ app.get("/auth/twitter/oauth1", function (req, res) {
   request(
     {
       url: "https://api.twitter.com/oauth/request_token",
-      method: "POST",
+      method: "GET",
       headers: {
-        oauth_callback: oauth_callback,
+        oauth_callback: new Buffer(oauth_callback).toString("base64"),
         oauth_consumer_key: keys.twitterAPIKey,
+        oauth_nonce: "ea9ec8429b68d6b77cd5600adbbb0456",
+        oauth_signature: "F1Li3tvehgcraF8DMJ7OyxO4w9Y%3D",
+        oauth_signature_method: "HMAC-SHA1",
+        oauth_timestamp: "1318467427",
+        oauth_version: "1.0",
       },
     },
     function (error, response) {
@@ -48,11 +61,12 @@ app.get("/auth/twitter/callback", function (req, res) {
   );
 });
 
+// visualizza stato utente
 app.get("/auth/twitter/show", function (req, res) {
   request(
     {
       url:
-        "https://api.twitter.com/1.1/statuses/show.json?id=1359555091406213000",
+        "https://api.twitter.com/1.1/statuses/show.json?id=1116016340161134600",
       method: "GET",
       headers: {
         authorization: "Bearer " + keys.twitterAPIBearerToken,
@@ -65,6 +79,7 @@ app.get("/auth/twitter/show", function (req, res) {
   );
 });
 
+// info user
 app.get("/auth/twitter/api", function (req, res) {
   request(
     {
@@ -82,6 +97,7 @@ app.get("/auth/twitter/api", function (req, res) {
   );
 });
 
+// authorization
 app.get("/auth/twitter", function (req, res) {
   request(
     {
@@ -98,6 +114,7 @@ app.get("/auth/twitter", function (req, res) {
   );
 });
 
+// users info
 app.get("/auth/twitter/users", function (req, res) {
   request(
     {
@@ -115,3 +132,5 @@ app.get("/auth/twitter/users", function (req, res) {
 });
 
 app.listen(3000);
+
+*/

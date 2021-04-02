@@ -1,9 +1,10 @@
 const express = require("express");
+
 const app = express();
 
 // route homepage => '/'
-app.get("/", function (req, res) {
-  res.send("This is the Homepage");
+app.get("/", (req, res) => {
+  res.send("this is the homepage");
 });
 
 const server = app.listen(3000, () => {
