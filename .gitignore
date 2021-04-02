@@ -1,5 +1,4 @@
- **/server/config/keys.js
-**/.node_modules/**
-**/.node_modules/
+**/keys.js
+**/node_modules
 **/.DS_Store
 /.DS_Store

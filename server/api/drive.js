@@ -7,6 +7,11 @@ function GoogleDrive(fileName, filePath, req, res){
 
     var fileSize = fs.statSync(filePath).size;
 
+    
+    fs.unlink('GoogleTokenInfo.json', function(err){
+      console.log(err);
+    });//Non serve più
+
     request(
         {
             method: "POST",
