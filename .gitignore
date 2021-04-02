@@ -1,6 +1,6 @@
 ./server/config/**
 server/config/keys.js
-**/.node_modules/**
-**/.node_modules/
+**/node_modules/**
+**/node_modules/
 **/.DS_Store
 /.DS_Store
