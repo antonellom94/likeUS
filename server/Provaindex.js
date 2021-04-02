@@ -1,11 +1,11 @@
 const express = require("express");
-const fs = require('fs');
 const gooogleAuth = require('./auth/Prova');
+const googleDrive = require('./api/drive');
 const app = express();
 
 // route homepage => '/'
 app.get("/", function (req, res) {
-  var googleButton = "<br>Press this to login to <button onclick='window.location.href=\"/auth/google\"'>Google</button>"; 
+  var googleButton = "<br>Press this to upload your image to <button onclick='window.location.href=\"/auth/google\"'>Drive</button>"; 
   res.send("This is the Homepage" + googleButton);
 });
 
@@ -18,10 +18,9 @@ app.get('/auth/google/callback', function(req, res) {
   gooogleAuth.GoogleToken(req, res, googleCode); 
 });
 
-app.get('/auth/google/api', function(req, res){
-  let body = fs.readFileSync('GoogleInfo.json');
-  var info = JSON.parse(body);
-  res.send(info.items[2].timeZone);  
+app.post('/upload/googleDrive', function(req, res) {
+  googleDrive.GoogleDrive('DeCocco', '../images/DeCocco.jpg', req, res);
+  res.redirect("http://localhost:3000/");
 });
 
 const server = app.listen(3000, () => {
