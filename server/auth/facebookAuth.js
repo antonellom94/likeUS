@@ -1,6 +1,6 @@
 const express = require('express')
 const axios = require('axios').default
-const keys = require('../config/keys')
+const keys = require('../../config/keys')
 const port = 3000
 
 const STATE = "OauthMiFaSchifo"
