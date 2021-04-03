@@ -1,5 +1,3 @@
-/* --  IN STANDBY
-
 const request = require("request");
 const express = require("express");
 const keys = require("../config/keys");
@@ -18,28 +16,6 @@ const oauth_nonce = new Buffer(
 ).toString("base64");
 
 var app = express();
-
-app.get("/auth/twitter/oauth1", function (req, res) {
-  request(
-    {
-      url: "https://api.twitter.com/oauth/request_token",
-      method: "GET",
-      headers: {
-        oauth_callback: new Buffer(oauth_callback).toString("base64"),
-        oauth_consumer_key: keys.twitterAPIKey,
-        oauth_nonce: "ea9ec8429b68d6b77cd5600adbbb0456",
-        oauth_signature: "F1Li3tvehgcraF8DMJ7OyxO4w9Y%3D",
-        oauth_signature_method: "HMAC-SHA1",
-        oauth_timestamp: "1318467427",
-        oauth_version: "1.0",
-      },
-    },
-    function (error, response) {
-      console.log(response.statusCode);
-      res.send(response.body);
-    }
-  );
-});
 
 app.get("/auth/twitter/callback", function (req, res) {
   request(
@@ -81,10 +57,12 @@ app.get("/auth/twitter/show", function (req, res) {
 
 // info user
 app.get("/auth/twitter/api", function (req, res) {
+  const screen_name = "@Totti";
   request(
     {
       url:
-        "https://api.twitter.com/1.1/statuses/user_timeline.json?count=10&screen_name=gianleo201",
+        "https://api.twitter.com/1.1/statuses/user_timeline.json?count=10&screen_name=" +
+        screen_name,
       method: "GET",
       headers: {
         authorization: "Bearer " + keys.twitterAPIBearerToken,
@@ -132,5 +110,3 @@ app.get("/auth/twitter/users", function (req, res) {
 });
 
 app.listen(3000);
-
-*/
