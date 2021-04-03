@@ -1,17 +1,14 @@
 const fs = require('fs');
 const request = require('request');
 
+//Tramite il token viene usata l'api per caricare l'mmagine fileName in filePath sulla directory Root dell'account di Google Drive
 function GoogleDrive(fileName, filePath, req, res){
 
     var a_t = fs.readFileSync('GoogleTokenInfo.json');
 
     var fileSize = fs.statSync(filePath).size;
 
-    
-    fs.unlink('GoogleTokenInfo.json', function(err){
-      console.log(err);
-    });//Non serve più
-
+    //Viene fatta la richiesta tramite il token per caricare un'immagine di nome fileName
     request(
         {
             method: "POST",
@@ -22,20 +19,21 @@ function GoogleDrive(fileName, filePath, req, res){
             },
             body: JSON.stringify({ name: fileName, mimeType: "image/jpeg" })
         },
-        function(err, request_res){
+        function(err, res){
           if (err) {
             console.log(err);
             return;
           }
       
+          //Viene caricata l'immagine di fileSize da filePath
           request(
             {
                 method: "PUT",
-                url: request_res.headers.location,
+                url: res.headers.location,
                 headers: { "Content-Range": `bytes 0-${fileSize - 1}/${fileSize}` },
                 body: fs.readFileSync(filePath)
             },
-            function(err, request_res, body){
+            function(err, res, body){
                 if (err) {
                     console.log(err);
                     return;
