@@ -20,7 +20,6 @@ app.get('/auth/google/callback', function(req, res) {
 
 app.post('/upload/googleDrive', function(req, res) {
   googleDrive.GoogleDrive('DeCocco', '../images/DeCocco.jpg', req, res);
-  res.redirect("http://localhost:3000/");
 });
 
 const server = app.listen(3000, () => {
