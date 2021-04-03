@@ -1,20 +1,5 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-./server/config/**
-server/config/keys.js
-**/config/
-**/server/config/keys.js
-./config/*
-./config/*
-**/config/**
-**/config/
->>>>>>> 41735c58b240084acda96b4b0c1c40a12ca2948a
-./node_modules/*
-./node_modules/*
-**/node_modules/**
 **/node_modules/
-**/.DS_Store
+**/config/keys.js
 /.DS_Store
 .metals
 .vscode
