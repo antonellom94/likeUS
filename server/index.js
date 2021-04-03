@@ -1,26 +1,72 @@
 const express = require("express");
-const gooogleAuth = require('./auth/googleAuth');
-const googleDrive = require('./api/drive');
+const gooogleAuth = require("./auth/googleAuth");
+const googleDrive = require("./api/drive");
+const cookieSession = require("cookie-session");
+const passport = require("passport");
+require("./passport/passport");
 const app = express();
+
+app.use(
+  cookieSession({
+    name: "twitter-auth-session",
+    keys: ["key1", "key2"],
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 // route homepage => '/'
 app.get("/", function (req, res) {
-  var googleButton = "<br>Press this to upload your image to <button onclick='window.location.href=\"/auth/google\"'>Drive</button>"; 
+  var googleButton =
+    "<br>Press this to upload your image to <button onclick='window.location.href=\"/auth/google\"'>Drive</button>";
   res.send("This is the Homepage" + googleButton);
 });
 
-app.get('/auth/google', function(req, res) {
-  gooogleAuth.GoogleAccess(req, res);  
+/* ------------------ GOOGLE API START ----------------------- */
+
+app.get("/auth/google", function (req, res) {
+  gooogleAuth.GoogleAccess(req, res);
 });
 
-app.get('/auth/google/callback', function(req, res) {
+app.get("/auth/google/callback", function (req, res) {
   var googleCode = req.query.code;
-  gooogleAuth.GoogleToken(req, res, googleCode); 
+  gooogleAuth.GoogleToken(req, res, googleCode);
 });
 
-app.post('/upload/googleDrive', function(req, res) {
-  googleDrive.GoogleDrive('DeCocco', '../images/DeCocco.jpg', req, res);
+app.post("/upload/googleDrive", function (req, res) {
+  googleDrive.GoogleDrive("DeCocco", "../images/DeCocco.jpg", req, res);
 });
+
+/* ------------------ GOOGLE API ENDS ----------------------- */
+
+/* ------------------ TWITTER API START ----------------------- */
+
+app.get("/auth/twitter/error", (req, res) => {
+  res.send("An error has occurred");
+});
+
+app.get("/auth/twitter", passport.authenticate("twitter"), () => {
+  console.log(passport.authenticate("twitter").profile);
+});
+
+app.get(
+  "/auth/twitter/callback",
+  passport.authenticate("twitter", {
+    failureRedirect: "/auth/twitter/error",
+  }),
+  (req, res) => {
+    res.redirect("/");
+  }
+);
+
+app.get("/auth/twitter/logout", (req, res) => {
+  req.session = null;
+  req.logout();
+  res.redirect("/");
+});
+
+/* ------------------ TWITTER API ENDS ----------------------- */
 
 const server = app.listen(3000, () => {
   var host = server.address().address;
