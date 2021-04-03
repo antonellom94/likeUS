@@ -1,10 +1,19 @@
 <<<<<<< HEAD
-./node_modules/*
-./node_modules/*
+<<<<<<< HEAD
 =======
+./server/config/**
+server/config/keys.js
+**/config/
+**/server/config/keys.js
+./config/*
+./config/*
+**/config/**
+**/config/
+>>>>>>> 41735c58b240084acda96b4b0c1c40a12ca2948a
+./node_modules/*
+./node_modules/*
 **/node_modules/**
 **/node_modules/
->>>>>>> 880f9bfbdf683de34790224cba67c6eea5cd04a2
 **/.DS_Store
 /.DS_Store
 .metals
