@@ -27,7 +27,9 @@ prova1.get('/page', (req, res) => {
         '&redirect_uri='+request_uri)// il redirect_uri deve essere proprio il request_uri utilizzato nel passo precedente come redirect per permettere il login
         .then(risposta_dio =>{
             TOKEN = risposta_dio.data.access_token
-            res.send('<a href="http://localhost:3000/get_posts"><button>ricevi informazioni sui post</button></a><a href="http://localhost:3000/get_photos"><button>ricevi informazioni sulle foto</button></a>')
+            res.send('<a href="http://localhost:3000/get_posts"><button>ricevi informazioni sui post</button></a>'+
+            '<a href="http://localhost:3000/get_photos"><button>ricevi informazioni sulle foto</button></a>'+
+            '<a href="http://localhost:3000/post_something"><button>Click here to post something on facebook</button></a>')
         })//tutto a buon fine, manda il token al browser
         .catch(err => console.log('errore: '+err));//c'è stato un errore stanpa l'errore
     }
@@ -50,6 +52,16 @@ prova1.get('/get_photos', (req, res) => {
     axios.get('https://graph.facebook.com/me/photos?access_token='+TOKEN)
     .then(api_res => {
         res.send(api_res.data)
+    })
+    .catch(err => {
+        res.send(err)
+    })
+})
+// chiamata api per postare su facebook (Non funziona finchè non mi approvano l'app dio ***)
+prova1.get('/post_something', (req, res) => {
+    axios.post('https://graph.facebook.com/me/feed?message=This post was published by Nodejs&access_token='+TOKEN)
+    .then(risp => {
+        res.send("Message correctly posted:"+risp.data)
     })
     .catch(err => {
         res.send(err)
