@@ -4,14 +4,23 @@ const keys = require('../../config/keys')
 const port = 3000
 
 const STATE = "OauthMiFaSchifo"
-const request_uri = 'https://www.facebook.com/v10.0/dialog/oauth?client_id='+keys.APP_ID+'&redirect_uri=http://localhost:3000/page&state='+STATE+'&scope=user_posts,user_photos'
+
+const request_uri = 'https://www.facebook.com/v10.0/dialog/oauth?client_id='+
+keys.APP_ID+'&redirect_uri=http://localhost:3000/page&state='+
+STATE+'&scope=user_posts,user_photos, pages_manage_posts'
+var TESTER_TOKEN = "EAADZB9KGeMxEBAHvjjzkIRl6ZCu3WoK3JxQhjCeseum8Y3g0JIC5m9qHjBbsNaZAp2MhzSF1IZBZBZCN5uyAWkNnHTu50TW6oIZAzb07d260ZAMZAgzh7IVyZB7pv8sUctFjOUjtUDKg44EsUxeCI4L99v5Duf3SdZAxHPrQMfzpVa1s70uZAPMZCQ09HgQydtdAfpvIVgdmvAqbF7B6GMqjRmgrg"
 var TOKEN = ""
 //creazione istanza express
 const prova1 = express()
 
 //Pagina principale da cui accedo a facebook, nella pagina c'è un bottone che fa una chiamata GET alla risorsa /login che reindirizza al login di FaceBook
 prova1.get('/', (req, res) => {
-    res.send('<a href="http://localhost:3000/login"><button>Accedi a Facebook</button></a>')
+    if(process.argv.length <= 2)
+        res.send('<a href="http://localhost:3000/login"><button>Accedi a Facebook</button></a>')
+    else if(process.argv[2] === "test"){
+        res.send('<a href="http://localhost:3000/page_bypass"><button>Accedi a Facebook come utente tester</button></a>')
+    }
+    else res.send("Si è verificato un errore inaspettato")
 });
 
 //redirect della pagina al login di facebook, una volta fatto il login il browser automaticamente chiamma la GET http://localhost:3000/page
@@ -37,6 +46,15 @@ prova1.get('/page', (req, res) => {
         res.send("Autenticazione compromessa");
     }
 })
+
+//pagina virtuale per utilizzare l'untente tester. NON FUNZIONA NEANCHE L'UTENTE TESTER
+prova1.get('/page_bypass', (req, res) => {
+    TOKEN = TESTER_TOKEN
+    res.send('<a href="http://localhost:3000/get_posts"><button>ricevi informazioni sui post</button></a>'+
+            '<a href="http://localhost:3000/get_photos"><button>ricevi informazioni sulle foto</button></a>'+
+            '<a href="http://localhost:3000/post_something"><button>Click here to post something on facebook</button></a>')
+})
+
 //chiamata api posts
 prova1.get('/get_posts', (req, res) => {
     axios.get('https://graph.facebook.com/me/feed?access_token='+TOKEN)
@@ -44,7 +62,7 @@ prova1.get('/get_posts', (req, res) => {
         res.send(api_res.data)
     })
     .catch(err => {
-        res.send(err)
+        res.send(err.status)
     })
 })
 //chiamata api foto
