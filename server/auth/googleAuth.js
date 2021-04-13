@@ -1,6 +1,5 @@
 var express = require('express');
 var request = require('request');
-var fs = require('fs');
 const keys = require("../config/keys")
 
 var app = express();
@@ -39,9 +38,12 @@ function GoogleToken(req, res, code){
     console.log('Upload successful!\nServer responded with:', body);
     var info = JSON.parse(body);
     a_t = info.access_token;
-    fs.writeFileSync('GoogleTokenInfo.json', a_t);
     res.send("Uploading...<br>Meanwhile, return to the <button onclick='window.location.href=\"/\"'>homepage</button>");
     request.post("http://localhost:3000/upload/googleDrive");
   });
 }
-module.exports = { GoogleAccess, GoogleToken };
+
+function getToken() {
+  return a_t;
+}
+module.exports = { GoogleAccess, GoogleToken, getToken };
