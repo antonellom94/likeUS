@@ -25,9 +25,6 @@ app.use(
 app.get("/", function (req, res) {
   const cookies = req.cookies;
   console.log(cookies);
-  //console.log(cookies["express:sess"]);
-
-  //console.log("Signed cookies: " + req.signedCookies);
 
   var googleButton =
     "<br>Press this to upload your image to <button onclick='window.location.href=\"/auth/google\"'>Drive</button>";
