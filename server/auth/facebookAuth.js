@@ -7,7 +7,7 @@ const STATE = "OauthMiFaSchifo"
 
 const request_uri = 'https://www.facebook.com/v10.0/dialog/oauth?client_id='+
 keys.APP_ID+'&redirect_uri=http://localhost:3000/page&state='+
-STATE+'&scope=user_posts,user_photos, pages_manage_posts'
+STATE+"&scope=pages_manage_posts"
 var TESTER_TOKEN = "EAADZB9KGeMxEBAHvjjzkIRl6ZCu3WoK3JxQhjCeseum8Y3g0JIC5m9qHjBbsNaZAp2MhzSF1IZBZBZCN5uyAWkNnHTu50TW6oIZAzb07d260ZAMZAgzh7IVyZB7pv8sUctFjOUjtUDKg44EsUxeCI4L99v5Duf3SdZAxHPrQMfzpVa1s70uZAPMZCQ09HgQydtdAfpvIVgdmvAqbF7B6GMqjRmgrg"
 var TOKEN = ""
 //creazione istanza express
