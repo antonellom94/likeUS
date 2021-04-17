@@ -1,23 +1,24 @@
 const express = require("express");
 const gooogleAuth = require("./auth/googleAuth");
 const googleApi = require("./api/googleApi");
-const cookieSession = require("cookie-session");
+const cookieParser = require("cookie-parser");
 const passport = require("passport");
+
 require("./passport/passport");
 const app = express();
-
-app.use(
-  cookieSession({
-    name: "twitter-auth-session",
-    keys: ["key1", "key2"],
-  })
-);
 
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use(cookieParser());
+
 // route homepage => '/'
 app.get("/", function (req, res) {
+  console.log("Cookies: ", req.cookies);
+  console.log("fine  cookie");
+
+  //console.log("Signed cookies: " + req.signedCookies);
+
   var googleButton =
     "<br>Press this to upload your image to <button onclick='window.location.href=\"/auth/google\"'>Drive</button>";
   res.send("This is the Homepage" + googleButton);
