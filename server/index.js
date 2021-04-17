@@ -1,6 +1,7 @@
 const express = require("express");
+const request = require('request');
 const session = require("express-session");
-const gooogleAuth = require("./auth/googleAuth");
+const googleAuth = require("./auth/googleAuth");
 const googleApi = require("./api/googleApi");
 const cookieParser = require("cookie-parser");
 const passport = require("passport");
@@ -10,7 +11,7 @@ const app = express();
 
 app.use(passport.initialize());
 app.use(passport.session());
-
+app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 app.use(
@@ -23,32 +24,57 @@ app.use(
 
 // route homepage => '/'
 app.get("/", function (req, res) {
-  const cookies = req.cookies;
+  var cookies = req.cookies;
   // sessione express
   console.log(cookies);
   //console.log(cookies["express:sess"]);
 
   //console.log("Signed cookies: " + req.signedCookies);
+  var googleButton =
+      "<br>Press this to upload your image to <button onclick='window.location.href=\"/auth/google\"'>Drive</button>";  
+  if(cookies.googleToken)
+    if(cookies.googleToken.expire_time < Date.now())
+      googleButton = 
+        "<br>You're already logged with google!"+
+        "<br>If you want, you can <button onclick='window.location.href=\"/logout/google\"'>logout</button> and try with another google account!"+ 
+        "<br>Try your upload on <button onclick='window.location.href=\"/upload\"'>Drive</button>";
+
+
   var twitterButton =
     "<button onclick='window.location.href=\"/auth/twitter\"'>Login</button>";
-  var googleButton =
-    "<br>Press this to upload your image to <button onclick='window.location.href=\"/auth/google\"'>Drive</button>";
   res.send("This is the Homepage" + googleButton + twitterButton);
 });
 
 /* ------------------ GOOGLE API START ----------------------- */
 
 app.get("/auth/google", function (req, res) {
-  gooogleAuth.GoogleAccess(req, res);
+  googleAuth.GoogleAccess(req, res);
 });
 
 app.get("/auth/google/callback", function (req, res) {
   var googleCode = req.query.code;
-  gooogleAuth.GoogleToken(req, res, googleCode);
+  googleAuth.GoogleToken(req, res, googleCode);
+});
+
+app.get("/upload", function(req, res) {
+  var cookies = req.cookies;
+  if(cookies.googleToken.expire_time > Date.now())
+    res.send("Your token expired!<br>You can, return to the <button onclick='window.location.href=\"/\"'>homepage</button>" +
+              +" or you can try to <button onclick='window.location.href=\"/auth/google\"'>login</button>"); 
+  else{
+    res.send("Uploading...<br>Meanwhile, return to the <button onclick='window.location.href=\"/\"'>homepage</button>");
+    var a_t =req.cookies.googleToken.token;
+    request.post("http://localhost:3000/upload/googleDrive?a_t="+a_t);
+  }
 });
 
 app.post("/upload/googleDrive", function (req, res) {
   googleApi.GoogleDrive("DeCocco", "../images/DeCocco.jpg", req, res);
+});
+
+app.get("/logout/google", function(req, res) {
+  res.clearCookie("googleToken");
+  res.redirect("/");
 });
 
 /* ------------------ GOOGLE API ENDS ----------------------- */

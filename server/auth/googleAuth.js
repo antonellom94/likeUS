@@ -17,7 +17,7 @@ var getCode = "https://accounts.google.com/o/oauth2/auth?client_id="+client_id+"
 
 //Si chiede l'accesso all'account Google dell'utente eseguendo inoltre la richiesta dei consensi per poter procedere
 function GoogleAccess(req, res){
-  if(a_t === '')
+  if(a_t === '' || a_t.expire_time < Date.now())
     res.redirect(getCode);
   else{
     res.send("Uploading...<br>Meanwhile, return to the <button onclick='window.location.href=\"/\"'>homepage</button>");
@@ -37,9 +37,12 @@ function GoogleToken(req, res, code){
     }
     console.log('Upload successful!\nServer responded with:', body);
     var info = JSON.parse(body);
-    a_t = info.access_token;
-    res.send("Uploading...<br>Meanwhile, return to the <button onclick='window.location.href=\"/\"'>homepage</button>");
-    request.post("http://localhost:3000/upload/googleDrive");
+    a_t = {
+            'token' : info.access_token,
+            'expire_time' : Date.now() - info.expires_in * 1000 //Millisecondi
+          };
+    res.cookie("googleToken", a_t);
+    res.redirect("/upload");
   });
 }
 
