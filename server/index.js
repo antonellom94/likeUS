@@ -16,7 +16,7 @@ app.use(cookieParser());
 app.get("/", function (req, res) {
   const cookies = req.cookies;
   // sessione express
-  console.log(cookies["express:sess"]);
+  //console.log(cookies["express:sess"]);
 
   //console.log("Signed cookies: " + req.signedCookies);
 
