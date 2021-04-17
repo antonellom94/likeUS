@@ -1,26 +1,24 @@
 const express = require('express')
 const axios = require('axios').default
-const keys = require('../../config/keys')
+const keys = require('../config/keys')
 const port = 3000
+var cookieParser = require('cookie-parser')
 
 const STATE = "OauthMiFaSchifo"
 
 const request_uri = 'https://www.facebook.com/v10.0/dialog/oauth?client_id='+
 keys.APP_ID+'&redirect_uri=http://localhost:3000/page&state='+
-STATE+"&scope=pages_manage_posts"
+STATE+"&scope=user_photos,user_posts"
 var TESTER_TOKEN = "EAADZB9KGeMxEBAHvjjzkIRl6ZCu3WoK3JxQhjCeseum8Y3g0JIC5m9qHjBbsNaZAp2MhzSF1IZBZBZCN5uyAWkNnHTu50TW6oIZAzb07d260ZAMZAgzh7IVyZB7pv8sUctFjOUjtUDKg44EsUxeCI4L99v5Duf3SdZAxHPrQMfzpVa1s70uZAPMZCQ09HgQydtdAfpvIVgdmvAqbF7B6GMqjRmgrg"
 var TOKEN = ""
 //creazione istanza express
 const prova1 = express()
+prova1.use(cookieParser())
+
 
 //Pagina principale da cui accedo a facebook, nella pagina c'è un bottone che fa una chiamata GET alla risorsa /login che reindirizza al login di FaceBook
 prova1.get('/', (req, res) => {
-    if(process.argv.length <= 2)
-        res.send('<a href="http://localhost:3000/login"><button>Accedi a Facebook</button></a>')
-    else if(process.argv[2] === "test"){
-        res.send('<a href="http://localhost:3000/page_bypass"><button>Accedi a Facebook come utente tester</button></a>')
-    }
-    else res.send("Si è verificato un errore inaspettato")
+    res.send('<a href="http://localhost:3000/login"><button>Accedi a Facebook</button></a>')
 });
 
 //redirect della pagina al login di facebook, una volta fatto il login il browser automaticamente chiamma la GET http://localhost:3000/page

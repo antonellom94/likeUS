@@ -24,7 +24,17 @@ app.use(
 // route homepage => '/'
 app.get("/", function (req, res) {
   const cookies = req.cookies;
+<<<<<<< HEAD
+  // sessione express
+=======
   console.log(cookies);
+<<<<<<< HEAD
+=======
+>>>>>>> 1cb04db3500f22ef23f5e03c5730558269eb7aa4
+  //console.log(cookies["express:sess"]);
+
+  //console.log("Signed cookies: " + req.signedCookies);
+>>>>>>> c602db2fee787c5016505e3b6d03f8ed0fae98ff
 
   var googleButton =
     "<br>Press this to upload your image to <button onclick='window.location.href=\"/auth/google\"'>Drive</button>";
