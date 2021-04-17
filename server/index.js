@@ -1,4 +1,5 @@
 const express = require("express");
+const session = require("express-session");
 const gooogleAuth = require("./auth/googleAuth");
 const googleApi = require("./api/googleApi");
 const cookieParser = require("cookie-parser");
@@ -12,10 +13,22 @@ app.use(passport.session());
 
 app.use(cookieParser());
 
+app.use(
+  session({
+    secret: "sttringarandomica",
+    resave: false,
+    saveUninitialized: true,
+  })
+);
+
 // route homepage => '/'
 app.get("/", function (req, res) {
   const cookies = req.cookies;
+<<<<<<< HEAD
   // sessione express
+=======
+  console.log(cookies);
+>>>>>>> 1cb04db3500f22ef23f5e03c5730558269eb7aa4
   //console.log(cookies["express:sess"]);
 
   //console.log("Signed cookies: " + req.signedCookies);
