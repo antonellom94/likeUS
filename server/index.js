@@ -1,6 +1,6 @@
 const express = require("express");
 const gooogleAuth = require("./auth/googleAuth");
-const googleDrive = require("./api/drive");
+const googleApi = require("./api/googleApi");
 const cookieSession = require("cookie-session");
 const passport = require("passport");
 require("./passport/passport");
@@ -35,7 +35,7 @@ app.get("/auth/google/callback", function (req, res) {
 });
 
 app.post("/upload/googleDrive", function (req, res) {
-  googleDrive.GoogleDrive("DeCocco", "../images/DeCocco.jpg", req, res);
+  googleApi.GoogleDrive("DeCocco", "../images/DeCocco.jpg", req, res);
 });
 
 /* ------------------ GOOGLE API ENDS ----------------------- */
