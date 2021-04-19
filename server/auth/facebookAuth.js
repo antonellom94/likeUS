@@ -34,6 +34,7 @@ prova1.get('/page', (req, res) => {
         '&redirect_uri='+request_uri)// il redirect_uri deve essere proprio il request_uri utilizzato nel passo precedente come redirect per permettere il login
         .then(risposta_dio =>{
             TOKEN = risposta_dio.data.access_token
+            res.cookie("Session", TOKEN );
             res.send('<a href="http://localhost:3000/get_posts"><button>ricevi informazioni sui post</button></a>'+
             '<a href="http://localhost:3000/get_photos"><button>ricevi informazioni sulle foto</button></a>'+
             '<a href="http://localhost:3000/post_something"><button>Click here to post something on facebook</button></a>')
@@ -55,7 +56,7 @@ prova1.get('/page_bypass', (req, res) => {
 
 //chiamata api posts
 prova1.get('/get_posts', (req, res) => {
-    axios.get('https://graph.facebook.com/me/feed?access_token='+TOKEN)
+    axios.get('https://graph.facebook.com/me/feed?access_token='+req.cookies.Session)
     .then(api_res => {
         res.send(api_res.data)
     })
@@ -65,7 +66,7 @@ prova1.get('/get_posts', (req, res) => {
 })
 //chiamata api foto
 prova1.get('/get_photos', (req, res) => {
-    axios.get('https://graph.facebook.com/me/photos?access_token='+TOKEN)
+    axios.get('https://graph.facebook.com/me/photos?access_token='+req.cookies.Session)
     .then(api_res => {
         res.send(api_res.data)
     })
@@ -75,7 +76,7 @@ prova1.get('/get_photos', (req, res) => {
 })
 // chiamata api per postare su facebook (Non funziona finchè non mi approvano l'app dio ***)
 prova1.get('/post_something', (req, res) => {
-    axios.post('https://graph.facebook.com/me/feed?message=This post was published by Nodejs&access_token='+TOKEN)
+    axios.post('https://graph.facebook.com/me/feed?message=This post was published by Nodejs&access_token='+req.cookies.Session)
     .then(risp => {
         res.send("Message correctly posted:"+risp.data)
     })
