@@ -2,7 +2,7 @@ const express = require('express')
 const axios = require('axios').default
 const keys = require('../config/keys')
 const port = 3000
-var cookieParser = require('cookie-parser')
+var session = require('express-session')
 
 const STATE = "OauthMiFaSchifo"
 
@@ -13,8 +13,14 @@ var TESTER_TOKEN = "EAADZB9KGeMxEBAHvjjzkIRl6ZCu3WoK3JxQhjCeseum8Y3g0JIC5m9qHjBb
 var TOKEN = ""
 //creazione istanza express
 const prova1 = express()
-prova1.use(cookieParser())
-
+prova1.use(session({
+    store:
+    secret: "keyboard cat",
+    name: "Awanagana",
+    saveUninitialized: true,
+    resave: false,
+})
+);
 
 //Pagina principale da cui accedo a facebook, nella pagina c'è un bottone che fa una chiamata GET alla risorsa /login che reindirizza al login di FaceBook
 prova1.get('/', (req, res) => {
@@ -34,7 +40,7 @@ prova1.get('/page', (req, res) => {
         '&redirect_uri='+request_uri)// il redirect_uri deve essere proprio il request_uri utilizzato nel passo precedente come redirect per permettere il login
         .then(risposta_dio =>{
             TOKEN = risposta_dio.data.access_token
-            res.cookie("Session", TOKEN );
+            
             res.send('<a href="http://localhost:3000/get_posts"><button>ricevi informazioni sui post</button></a>'+
             '<a href="http://localhost:3000/get_photos"><button>ricevi informazioni sulle foto</button></a>'+
             '<a href="http://localhost:3000/post_something"><button>Click here to post something on facebook</button></a>')
@@ -56,7 +62,9 @@ prova1.get('/page_bypass', (req, res) => {
 
 //chiamata api posts
 prova1.get('/get_posts', (req, res) => {
-    axios.get('https://graph.facebook.com/me/feed?access_token='+req.cookies.Session)
+    console.log(req.session)
+    console.log(req.get("Cookie"))
+    axios.get('https://graph.facebook.com/me/feed?access_token='+TOKEN)
     .then(api_res => {
         res.send(api_res.data)
     })
@@ -66,7 +74,7 @@ prova1.get('/get_posts', (req, res) => {
 })
 //chiamata api foto
 prova1.get('/get_photos', (req, res) => {
-    axios.get('https://graph.facebook.com/me/photos?access_token='+req.cookies.Session)
+    axios.get('https://graph.facebook.com/me/photos?access_token='+TOKEN)
     .then(api_res => {
         res.send(api_res.data)
     })
@@ -76,7 +84,7 @@ prova1.get('/get_photos', (req, res) => {
 })
 // chiamata api per postare su facebook (Non funziona finchè non mi approvano l'app dio ***)
 prova1.get('/post_something', (req, res) => {
-    axios.post('https://graph.facebook.com/me/feed?message=This post was published by Nodejs&access_token='+req.cookies.Session)
+    axios.post('https://graph.facebook.com/me/feed?message=This post was published by Nodejs&access_token='+TOKEN)
     .then(risp => {
         res.send("Message correctly posted:"+risp.data)
     })
