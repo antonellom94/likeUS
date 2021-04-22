@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<head>
+    <script>
+        var counter, ws
+        var go_vitaletti_go = true
+        function start_ws(){
+            counter = 0
+            ws = new WebSocket("ws://localhost:3000/")
+
+            ws.onmessage = (event) => {
+                if(counter >= 10){
+                    esegui()
+                }
+                else{
+                    document.getElementById('Vitellone').style.backgroundColor = JSON.parse(event.data).color
+                    counter++
+                }
+            }
+        }
+        function esegui(){
+            if(go_vitaletti_go === true){
+                counter = 0
+                ws.send(JSON.stringify({ok: true}))
+                go_vitaletti_go = false
+            }
+            else{
+                ws.send(JSON.stringify({ok: false}))
+                go_vitaletti_go = true
+            }
+        }
+    </script>
+    <title>this page does nothing</title>
+</head>
+<body onload="start_ws()">
+    <p>Click here to see the power of Vitellone LGBT mode</p>
+    <button id="Vitellone" style="background-color: blue;" onclick="esegui()">Vitellone LGBT</button>
+    <br>
+    <img src="https://www.tedxroma.com/wp-content/uploads/2017/12/andrea-vitaletti-b.jpg"/>
+</body>

@@ -2,7 +2,6 @@ const express = require('express')
 const axios = require('axios').default
 const keys = require('../config/keys')
 const port = 3000
-var session = require('express-session')
 
 const STATE = "OauthMiFaSchifo"
 
@@ -14,7 +13,6 @@ var TOKEN = ""
 //creazione istanza express
 const prova1 = express()
 prova1.use(session({
-    store:
     secret: "keyboard cat",
     name: "Awanagana",
     saveUninitialized: true,
@@ -51,15 +49,6 @@ prova1.get('/page', (req, res) => {
         res.send("Autenticazione compromessa");
     }
 })
-
-//pagina virtuale per utilizzare l'untente tester. NON FUNZIONA NEANCHE L'UTENTE TESTER
-prova1.get('/page_bypass', (req, res) => {
-    TOKEN = TESTER_TOKEN
-    res.send('<a href="http://localhost:3000/get_posts"><button>ricevi informazioni sui post</button></a>'+
-            '<a href="http://localhost:3000/get_photos"><button>ricevi informazioni sulle foto</button></a>'+
-            '<a href="http://localhost:3000/post_something"><button>Click here to post something on facebook</button></a>')
-})
-
 //chiamata api posts
 prova1.get('/get_posts', (req, res) => {
     console.log(req.session)
@@ -92,5 +81,5 @@ prova1.get('/post_something', (req, res) => {
         res.send(err)
     })
 })
-//metto il server in ascolto
-prova1.listen(port)
+
+prova1.listen(3000)
