@@ -119,7 +119,7 @@ app.get("/try_ws", (req,res)=> {
   res.send(require('fs').readFileSync('../client/prova.html', {encoding: 'utf-8'}));
 })
 
-// Colors for vitaletti LGBT
+// Colors for multicolor button
 let colors = ["blue","red","green","violet","yellow","orange","brown"]
 //Web socket handling
 const server = require('http').createServer(app)
@@ -127,50 +127,25 @@ const wss = new websocket.Server({server: server})
 wss.on('connection', (ws)=>{
     console.log("SOMEONE HAS CONNECTED")
     ws.counter = 0
-    ws.streaming = false
     ws.on('message', (data) =>{
         let mex = JSON.parse(data)
         if(mex.ok === true){
-            //manda colori
-            ws.streaming = true
-            spamColors(ws)
+            //Send color
+            ws.send(JSON.stringify({color: colors[ws.counter%colors.length]}));
+            ws.counter++;
+            // set repetitive sendigs
+            ws.streaming = setInterval(()=>{
+              ws.send(JSON.stringify({color: colors[ws.counter%colors.length]}));
+              ws.counter++;
+            }, 500)
+            
         }
         if( mex.ok === false){
-            ws.streaming = false
+          // clear previous settings
+          clearInterval(ws.streaming)
         }
     });
 });
-
-/**
-* @param {WebSocket} ws Web socket instance
-*/
-var spamColors = async (ws) => {
-    let personilized_promise = new Promise(async (resolve, reject) => {
-        while(true){
-            await waitSync(500)
-            if(ws.streaming === false){
-                resolve("Stopped");
-                return;
-            }
-            ws.send(JSON.stringify({color: colors[ws.counter%colors.length]}));
-            ws.counter++;
-        }
-    })
-    return personilized_promise
-}
-
-/**
- * call this method like this: await waitSync(ms)
- * @param {Number} ms Time to wait in ms
- * @returns 
- */
-var waitSync = async (ms) => {
-    return new Promise((resolve, reject)=> {
-        setTimeout(()=>{
-            resolve()
-        }, ms)
-    })
-}
 
 server.listen(3000, ()=> {
   console.log('server reachable at port 3000')

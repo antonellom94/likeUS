@@ -12,7 +12,7 @@
                     esegui()
                 }
                 else{
-                    document.getElementById('Vitellone').style.backgroundColor = JSON.parse(event.data).color
+                    document.getElementById('RGB_Button').style.backgroundColor = JSON.parse(event.data).color
                     counter++
                 }
             }
@@ -29,11 +29,13 @@
             }
         }
     </script>
-    <title>this page does nothing</title>
+    <title>Web socket page</title>
 </head>
 <body onload="start_ws()">
-    <p>Click here to see the power of Vitellone LGBT mode</p>
-    <button id="Vitellone" style="background-color: blue;" onclick="esegui()">Vitellone LGBT</button>
-    <br>
-    <img src="https://www.tedxroma.com/wp-content/uploads/2017/12/andrea-vitaletti-b.jpg"/>
+    <p>Click here to change button's color</p>
+    <button id="RGB_Button" style="background-color: blue;" onclick="esegui()">Multicolor Button</button>
+    <div id="chat_div" style="border: 5px solid; width: 400px; height: 400px;background-color: blue;position: absolute; top: 5%; right: 5px; border-radius: 5%;">
+        <p style="position:relative; text-align: center; font-size: 30px;font-weight: bold; margin-top: 0;">CHAT</p>
+        <textarea style="position: absolute;;width: 95%; margin-left: 2%; border: 2px thin; bottom: 2px; resize: unset;"></textarea>
+    </div>
 </body>
