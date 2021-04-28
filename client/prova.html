@@ -8,12 +8,18 @@
             ws = new WebSocket("ws://localhost:3000/")
 
             ws.onmessage = (event) => {
-                if(counter >= 10){
-                    esegui()
+                let mex = JSON.parse(event.data)
+                if(mex.color !== undefined){
+                    if(counter >= 10){
+                        esegui()
+                    }
+                    else{
+                        document.getElementById('RGB_Button').style.backgroundColor = mex.color
+                        counter++
+                    }
                 }
-                else{
-                    document.getElementById('RGB_Button').style.backgroundColor = JSON.parse(event.data).color
-                    counter++
+                else if(mex.color === undefined && mex.message !== undefined ){
+                    document.getElementById("message_list").innerHTML += "<li>"+mex.message+"</li>"
                 }
             }
         }
@@ -28,14 +34,33 @@
                 go_vitaletti_go = true
             }
         }
+        function send_message(event){
+            let key = event.which
+            if(key === 13){
+                let txtar = document.getElementById("text_area")
+                let text = txtar.value
+                txtar.value = ""
+                let chat = document.getElementById("message_list")
+                chat.innerHTML += "<li>"+text+"</li>"
+                ws.send(JSON.stringify({message: text}))
+            }
+        }
+        function clear_chat(){
+            document.getElementById("message_list").innerHTML = ""
+        }
     </script>
     <title>Web socket page</title>
 </head>
 <body onload="start_ws()">
     <p>Click here to change button's color</p>
     <button id="RGB_Button" style="background-color: blue;" onclick="esegui()">Multicolor Button</button>
-    <div id="chat_div" style="border: 5px solid; width: 400px; height: 400px;background-color: blue;position: absolute; top: 5%; right: 5px; border-radius: 5%;">
+    <div id="chat_div" style="border: 5px solid; width: 400px; height: 500px;background-color: blue;position: absolute; top: 5%; right: 5px; border-radius: 5%;">
         <p style="position:relative; text-align: center; font-size: 30px;font-weight: bold; margin-top: 0;">CHAT</p>
-        <textarea style="position: absolute;;width: 95%; margin-left: 2%; border: 2px thin; bottom: 2px; resize: unset;"></textarea>
+        <button id="clear_chat_button" style="position: absolute; left: 38%; font-size:large;" onclick="clear_chat()">Clear chat</button>
+        <div id="chat" style="overflow-y: scroll; position: relative; height: 350px;border-color: green;border-radius: 2px; border: 3px solid; background-color: white; top: 30px;">
+            <ul id="message_list">
+            </ul>
+        </div>
+        <textarea id="text_area" style="position: absolute;;width: 95%; margin-left: 2%; border: 2px thin; bottom: 2px; resize: unset;" onkeypress="send_message(event)"></textarea>
     </div>
 </body>

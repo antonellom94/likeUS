@@ -125,7 +125,6 @@ let colors = ["blue","red","green","violet","yellow","orange","brown"]
 const server = require('http').createServer(app)
 const wss = new websocket.Server({server: server})
 wss.on('connection', (ws)=>{
-    console.log("SOMEONE HAS CONNECTED")
     ws.counter = 0
     ws.on('message', (data) =>{
         let mex = JSON.parse(data)
@@ -143,6 +142,12 @@ wss.on('connection', (ws)=>{
         if( mex.ok === false){
           // clear previous settings
           clearInterval(ws.streaming)
+        }
+        else if(mex.ok === undefined && mex.message !== undefined){
+          let text_to_broadcast = mex.message
+          wss.clients.forEach((web_sock)=>{
+            if(web_sock !== ws) web_sock.send(data)
+          })
         }
     });
 });
