@@ -19,7 +19,7 @@
                     }
                 }
                 else if(mex.color === undefined && mex.message !== undefined ){
-                    document.getElementById("message_list").innerHTML += "<li>"+mex.message+"</li>"
+                    document.getElementById("chat").innerHTML += "<div class='message others'>"+mex.message+"<div>"
                 }
             }
         }
@@ -40,26 +40,56 @@
                 let txtar = document.getElementById("text_area")
                 let text = txtar.value
                 txtar.value = ""
-                let chat = document.getElementById("message_list")
-                chat.innerHTML += "<li>"+text+"</li>"
+                let chat = document.getElementById("chat")
+                chat.innerHTML += "<div class='message-line'><div class='message mine'>"+text+"</div></div>"
                 ws.send(JSON.stringify({message: text}))
             }
         }
         function clear_chat(){
-            document.getElementById("message_list").innerHTML = ""
+            document.getElementById("chat").innerHTML = ""
         }
     </script>
+    <style>
+        .message-line {
+            width: 100%;
+            display: inline-block;
+            background-color: transparent;
+            padding: 5px;
+            margin: 0;
+        }
+        .message {
+            position: relative;
+            border: 2px solid;
+            border-radius: 10px 10px 10px 10px;
+            width: fit-content;
+            width: 80%;
+            height: auto;
+            margin-top: 2px;
+            word-wrap: break-word;
+        }
+        .mine {
+            border-bottom-right-radius: 0px;
+            background-color: cyan;
+            display: block;
+            float: right;
+            margin-right: 20px;
+        }
+        .others{
+            border-bottom-left-radius: 0px;
+            background-color: green;
+            display: block;
+            margin-left: 10px;
+        }
+    </style>
     <title>Web socket page</title>
 </head>
 <body onload="start_ws()">
     <p>Click here to change button's color</p>
     <button id="RGB_Button" style="background-color: blue;" onclick="esegui()">Multicolor Button</button>
-    <div id="chat_div" style="border: 5px solid; width: 400px; height: 500px;background-color: blue;position: absolute; top: 5%; right: 5px; border-radius: 5%;">
+    <div id="chat_div" style="border: 5px solid; width: 400px; height: 500px;background-color: blue;position: absolute; top: 5%; right: 5px; border-radius: 5%">
         <p style="position:relative; text-align: center; font-size: 30px;font-weight: bold; margin-top: 0;">CHAT</p>
         <button id="clear_chat_button" style="position: absolute; left: 38%; font-size:large;" onclick="clear_chat()">Clear chat</button>
-        <div id="chat" style="overflow-y: scroll; position: relative; height: 350px;border-color: green;border-radius: 2px; border: 3px solid; background-color: white; top: 30px;">
-            <ul id="message_list">
-            </ul>
+        <div id="chat" style="overflow-y: scroll; position: relative; height: 350px;border-color: green;border-radius: 2px; border: 3px solid; background-color: white; top: 30px; width: 100%; box-sizing: border-box; margin: 0; overflow-x: hidden;">
         </div>
         <textarea id="text_area" style="position: absolute;;width: 95%; margin-left: 2%; border: 2px thin; bottom: 2px; resize: unset;" onkeypress="send_message(event)"></textarea>
     </div>
