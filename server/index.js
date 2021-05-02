@@ -13,7 +13,22 @@ const path = require("path");
 require("./passport/passport");
 const app = express();
 
-app.use("/home", express.static(path.join(__dirname, "..", "client")));
+// app.use("/home", express.static(path.join(__dirname, "..", "client")));
+// static middleware auto sets this routes 
+app.get('/home', (req, res)=>{
+  res.type('text/html')
+  res.send(require('fs').readFileSync('../client/index.html', {encoding: 'utf-8'}))
+})
+app.get('/assets/script/index.js', (req, res)=>{
+  res.type('application/javascript');
+  res.send(require('fs').readFileSync('../client/assets/script/index.js', {encoding: 'utf-8'}))
+})
+app.get('/assets/style/index.css', (req,res)=>{
+  res.type('text/css')
+  res.send(require('fs').readFileSync('../client/assets/style/index.css', {encoding: 'utf-8'}))
+})
+
+
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(
@@ -124,14 +139,6 @@ app.get("/auth/twitter/logout", (req, res) => {
 /* ------------------ TWITTER API ENDS ----------------------- */
 
 /*--------------------- WEBSOCKET -------------------------*/
-
-// ask this resource to try web socket and Vitaletti LGBT
-app.get("/try_ws", (req, res) => {
-  res.type("html");
-  res.send(
-    require("fs").readFileSync("../client/prova.html", { encoding: "utf-8" })
-  );
-});
 
 // Colors for multicolor button
 let colors = ["blue", "red", "green", "violet", "yellow", "orange", "brown"];
