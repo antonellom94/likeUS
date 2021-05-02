@@ -8,10 +8,12 @@ const cookieSession = require("cookie-session");
 const passport = require("passport");
 const websocket = require("ws");
 const keys = require("./config/keys");
+const path = require("path");
 
 require("./passport/passport");
 const app = express();
 
+app.use("/home", express.static(path.join(__dirname, "..", "client")));
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(
@@ -33,6 +35,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // route homepage => '/'
+
 app.get("/", function (req, res) {
   var cookies = req.cookies;
   console.log(cookies);
