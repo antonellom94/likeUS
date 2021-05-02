@@ -6,11 +6,7 @@ const googleApi = require("./api/googleApi");
 const cookieParser = require("cookie-parser");
 const cookieSession = require("cookie-session");
 const passport = require("passport");
-<<<<<<< HEAD
 const keys = require("./config/keys");
-=======
-const websocket = require('ws')
->>>>>>> 77af130baba6bd27685f6a9d72fb345d01911490
 
 require("./passport/passport");
 const app = express();
@@ -123,51 +119,47 @@ app.get("/auth/twitter/logout", (req, res) => {
 
 /* ------------------ TWITTER API ENDS ----------------------- */
 
-
-
-
 /*--------------------- WEBSOCKET -------------------------*/
 
 // ask this resource to try web socket and Vitaletti LGBT
-app.get("/try_ws", (req,res)=> {
-  res.type('html')
-  res.send(require('fs').readFileSync('../client/prova.html', {encoding: 'utf-8'}));
-})
-
-// Colors for multicolor button
-let colors = ["blue","red","green","violet","yellow","orange","brown"]
-//Web socket handling
-const server = require('http').createServer(app)
-const wss = new websocket.Server({server: server})
-wss.on('connection', (ws)=>{
-    ws.counter = 0
-    ws.on('message', (data) =>{
-        let mex = JSON.parse(data)
-        if(mex.ok === true){
-            //Send color
-            ws.send(JSON.stringify({color: colors[ws.counter%colors.length]}));
-            ws.counter++;
-            // set repetitive sendigs
-            ws.streaming = setInterval(()=>{
-              ws.send(JSON.stringify({color: colors[ws.counter%colors.length]}));
-              ws.counter++;
-            }, 500)
-            
-        }
-        if( mex.ok === false){
-          // clear previous settings
-          clearInterval(ws.streaming)
-        }
-        else if(mex.ok === undefined && mex.message !== undefined){
-          let text_to_broadcast = mex.message
-          wss.clients.forEach((web_sock)=>{
-            if(web_sock !== ws) web_sock.send(data)
-          })
-        }
-    });
+app.get("/try_ws", (req, res) => {
+  res.type("html");
+  res.send(
+    require("fs").readFileSync("../client/prova.html", { encoding: "utf-8" })
+  );
 });
 
-server.listen(3000, ()=> {
-  console.log('server reachable at port 3000')
-})
+// Colors for multicolor button
+let colors = ["blue", "red", "green", "violet", "yellow", "orange", "brown"];
+//Web socket handling
+const server = require("http").createServer(app);
+const wss = new websocket.Server({ server: server });
+wss.on("connection", (ws) => {
+  ws.counter = 0;
+  ws.on("message", (data) => {
+    let mex = JSON.parse(data);
+    if (mex.ok === true) {
+      //Send color
+      ws.send(JSON.stringify({ color: colors[ws.counter % colors.length] }));
+      ws.counter++;
+      // set repetitive sendigs
+      ws.streaming = setInterval(() => {
+        ws.send(JSON.stringify({ color: colors[ws.counter % colors.length] }));
+        ws.counter++;
+      }, 500);
+    }
+    if (mex.ok === false) {
+      // clear previous settings
+      clearInterval(ws.streaming);
+    } else if (mex.ok === undefined && mex.message !== undefined) {
+      let text_to_broadcast = mex.message;
+      wss.clients.forEach((web_sock) => {
+        if (web_sock !== ws) web_sock.send(data);
+      });
+    }
+  });
+});
 
+server.listen(3000, () => {
+  console.log("server reachable at port 3000");
+});
