@@ -2,7 +2,6 @@ const express = require('express')
 const axios = require('axios').default
 const keys = require('../config/keys')
 const port = 3000
-var cookieParser = require('cookie-parser')
 
 const STATE = "OauthMiFaSchifo"
 
@@ -13,8 +12,13 @@ var TESTER_TOKEN = "EAADZB9KGeMxEBAHvjjzkIRl6ZCu3WoK3JxQhjCeseum8Y3g0JIC5m9qHjBb
 var TOKEN = ""
 //creazione istanza express
 const prova1 = express()
-prova1.use(cookieParser())
-
+prova1.use(session({
+    secret: "keyboard cat",
+    name: "Awanagana",
+    saveUninitialized: true,
+    resave: false,
+})
+);
 
 //Pagina principale da cui accedo a facebook, nella pagina c'è un bottone che fa una chiamata GET alla risorsa /login che reindirizza al login di FaceBook
 prova1.get('/', (req, res) => {
@@ -34,6 +38,7 @@ prova1.get('/page', (req, res) => {
         '&redirect_uri='+request_uri)// il redirect_uri deve essere proprio il request_uri utilizzato nel passo precedente come redirect per permettere il login
         .then(risposta_dio =>{
             TOKEN = risposta_dio.data.access_token
+            
             res.send('<a href="http://localhost:3000/get_posts"><button>ricevi informazioni sui post</button></a>'+
             '<a href="http://localhost:3000/get_photos"><button>ricevi informazioni sulle foto</button></a>'+
             '<a href="http://localhost:3000/post_something"><button>Click here to post something on facebook</button></a>')
@@ -44,17 +49,10 @@ prova1.get('/page', (req, res) => {
         res.send("Autenticazione compromessa");
     }
 })
-
-//pagina virtuale per utilizzare l'untente tester. NON FUNZIONA NEANCHE L'UTENTE TESTER
-prova1.get('/page_bypass', (req, res) => {
-    TOKEN = TESTER_TOKEN
-    res.send('<a href="http://localhost:3000/get_posts"><button>ricevi informazioni sui post</button></a>'+
-            '<a href="http://localhost:3000/get_photos"><button>ricevi informazioni sulle foto</button></a>'+
-            '<a href="http://localhost:3000/post_something"><button>Click here to post something on facebook</button></a>')
-})
-
 //chiamata api posts
 prova1.get('/get_posts', (req, res) => {
+    console.log(req.session)
+    console.log(req.get("Cookie"))
     axios.get('https://graph.facebook.com/me/feed?access_token='+TOKEN)
     .then(api_res => {
         res.send(api_res.data)
@@ -83,5 +81,5 @@ prova1.get('/post_something', (req, res) => {
         res.send(err)
     })
 })
-//metto il server in ascolto
-prova1.listen(port)
+
+prova1.listen(3000)
