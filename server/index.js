@@ -9,6 +9,7 @@ const passport = require("passport");
 const websocket = require("ws");
 const keys = require("./config/keys");
 const path = require("path");
+const {spawn} = require('child_process');
 
 require("./passport/passport");
 const app = express();
@@ -169,6 +170,17 @@ wss.on("connection", (ws) => {
       });
     }
   });
+});
+
+
+/*------------------------Python Script----------------------*/
+
+app.get("/FaceRec", function(req, res){
+  const python = spawn('python', ['FaceRec.py', '../images/First.jpg', '../images/Second.jpg', '../images/Final.jpg']);
+  python.on('close', function(code) {
+    console.log("Script python")
+  });
+  res.redirect('/');
 });
 
 server.listen(3000, () => {
