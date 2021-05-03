@@ -10,6 +10,7 @@ const websocket = require("ws");
 const keys = require("./config/keys");
 const path = require("path");
 const {spawn} = require('child_process');
+const fr = require("./FaceRec.js");
 
 require("./passport/passport");
 const app = express();
@@ -53,6 +54,7 @@ app.use(passport.session());
 // route homepage => '/'
 
 app.get("/", function (req, res) {
+  console.log(path.join(__dirname, '/models/'));
   var cookies = req.cookies;
   console.log(cookies);
   //console.log(cookies["express:sess"]);
@@ -100,7 +102,7 @@ app.get("/upload", function (req, res) {
 });
 
 app.post("/upload/googleDrive", function (req, res) {
-  googleApi.GoogleDrive("DeCocco", "../images/DeCocco.jpg", req, res);
+  googleApi.GoogleDrive("DeCocco", "/server/images/DeCocco.jpg", req, res);
 });
 
 app.get("/logout/google", function (req, res) {
@@ -176,10 +178,14 @@ wss.on("connection", (ws) => {
 /*------------------------Python Script----------------------*/
 
 app.get("/FaceRec", function(req, res){
-  const python = spawn('python', ['FaceRec.py', '../images/First.jpg', '../images/Second.jpg', '../images/Final.jpg']);
+  /*
+  const python = spawn('python', ['FaceRec.py', '/server/images/First.jpg', '/server/images/Second.jpg', '/server/images/Final.jpg']);
   python.on('close', function(code) {
-    console.log("Script python")
+    console.log("Script python, Exit Code: " + code.toString());
   });
+  res.redirect('/');
+  */
+  let Var = fr.FaceRec('./images/First.jpg', './images/Second.jpg');
   res.redirect('/');
 });
 
