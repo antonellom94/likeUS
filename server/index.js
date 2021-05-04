@@ -11,6 +11,8 @@ const keys = require("./config/keys");
 const path = require("path");
 const {spawn} = require('child_process');
 const fr = require("./FaceRec.js");
+const fs = require("fs");
+var formidable = require('formidable');
 
 require("./passport/passport");
 const app = express();
@@ -54,7 +56,6 @@ app.use(passport.session());
 // route homepage => '/'
 
 app.get("/", function (req, res) {
-  console.log(path.join(__dirname, '/models/'));
   var cookies = req.cookies;
   console.log(cookies);
   //console.log(cookies["express:sess"]);
@@ -102,7 +103,7 @@ app.get("/upload", function (req, res) {
 });
 
 app.post("/upload/googleDrive", function (req, res) {
-  googleApi.GoogleDrive("DeCocco", "/server/images/DeCocco.jpg", req, res);
+  googleApi.GoogleDrive("DeCocco", path.join(__dirname, '/images/DeCocco.jpg'), req, res);
 });
 
 app.get("/logout/google", function (req, res) {
@@ -175,17 +176,36 @@ wss.on("connection", (ws) => {
 });
 
 
-/*------------------------Python Script----------------------*/
+/*------------------------FaceRec Script----------------------*/
 
-app.get("/FaceRec", function(req, res){
-  /*
-  const python = spawn('python', ['FaceRec.py', '/server/images/First.jpg', '/server/images/Second.jpg', '/server/images/Final.jpg']);
-  python.on('close', function(code) {
-    console.log("Script python, Exit Code: " + code.toString());
+app.post("/FaceRec", function(req, res){
+  var form = new formidable.IncomingForm();
+  var newpathFirst;
+  var newpathSecond;
+  form.parse(req, function (err, fields, files) {
+    var oldpath = files.First.path;
+    newpathFirst = path.join(__dirname, '/images/') + files.First.name;
+    fs.rename(oldpath, newpathFirst, function (err) {
+      if (err) throw err;
+    });
+    oldpath = files.Second.path;
+    newpathSecond = path.join(__dirname, '/images/') + files.Second.name;
+    fs.rename(oldpath, newpathSecond, function (err) {
+      if (err) throw err;
+    });
+
+    fr.FaceRec(newpathFirst, newpathSecond)
+      .then((result) => {
+        fs.unlinkSync(newpathFirst);
+        fs.unlinkSync(newpathSecond);
+        console.log("Finito!");
+      }).catch((err) => {
+        console.log(err);
+      });
+    
   });
-  res.redirect('/');
-  */
-  let Var = fr.FaceRec('./images/First.jpg', './images/Second.jpg');
+  
+
   res.redirect('/');
 });
 
