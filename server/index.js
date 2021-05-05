@@ -9,29 +9,17 @@ const passport = require("passport");
 const websocket = require("ws");
 const keys = require("./config/keys");
 const path = require("path");
-const {spawn} = require('child_process');
+const { spawn } = require("child_process");
 const fr = require("./FaceRec.js");
 const fs = require("fs");
-var formidable = require('formidable');
+var formidable = require("formidable");
 
 require("./passport/passport");
 const app = express();
 
 // app.use("/home", express.static(path.join(__dirname, "..", "client")));
-// static middleware auto sets this routes 
-app.get('/home', (req, res)=>{
-  res.type('text/html')
-  res.send(require('fs').readFileSync('../client/index.html', {encoding: 'utf-8'}))
-})
-app.get('/assets/script/index.js', (req, res)=>{
-  res.type('application/javascript');
-  res.send(require('fs').readFileSync('../client/assets/script/index.js', {encoding: 'utf-8'}))
-})
-app.get('/assets/style/index.css', (req,res)=>{
-  res.type('text/css')
-  res.send(require('fs').readFileSync('../client/assets/style/index.css', {encoding: 'utf-8'}))
-})
-
+// static middleware auto sets this routes
+app.use("/home", express.static(path.join(__dirname, "..", "client")));
 
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -103,7 +91,12 @@ app.get("/upload", function (req, res) {
 });
 
 app.post("/upload/googleDrive", function (req, res) {
-  googleApi.GoogleDrive("DeCocco", path.join(__dirname, '/images/DeCocco.jpg'), req, res);
+  googleApi.GoogleDrive(
+    "DeCocco",
+    path.join(__dirname, "/images/DeCocco.jpg"),
+    req,
+    res
+  );
 });
 
 app.get("/logout/google", function (req, res) {
@@ -175,21 +168,20 @@ wss.on("connection", (ws) => {
   });
 });
 
-
 /*------------------------FaceRec Script----------------------*/
 
-app.post("/FaceRec", function(req, res){
+app.post("/FaceRec", function (req, res) {
   var form = new formidable.IncomingForm();
   var newpathFirst;
   var newpathSecond;
   form.parse(req, function (err, fields, files) {
     var oldpath = files.First.path;
-    newpathFirst = path.join(__dirname, '/images/') + files.First.name;
+    newpathFirst = path.join(__dirname, "/images/") + files.First.name;
     fs.rename(oldpath, newpathFirst, function (err) {
       if (err) throw err;
     });
     oldpath = files.Second.path;
-    newpathSecond = path.join(__dirname, '/images/') + files.Second.name;
+    newpathSecond = path.join(__dirname, "/images/") + files.Second.name;
     fs.rename(oldpath, newpathSecond, function (err) {
       if (err) throw err;
     });
@@ -199,14 +191,13 @@ app.post("/FaceRec", function(req, res){
         fs.unlinkSync(newpathFirst);
         fs.unlinkSync(newpathSecond);
         console.log("Finito!");
-      }).catch((err) => {
+      })
+      .catch((err) => {
         console.log(err);
       });
-    
   });
-  
 
-  res.redirect('/');
+  res.redirect("/");
 });
 
 server.listen(3000, () => {
