@@ -42,7 +42,7 @@ function GoogleToken(req, res, code){
             'expire_time' : Date.now() - info.expires_in * 1000 //Millisecondi
           };
     res.cookie("googleToken", a_t);
-    res.redirect("/");
+    res.redirect("/upload");
   });
 }
 

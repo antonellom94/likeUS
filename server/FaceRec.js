@@ -7,13 +7,14 @@ const { Canvas, Image, ImageData } = canvas;
 faceapi.env.monkeyPatch({ Canvas, Image, ImageData });
 const MODEL_URL = `${__dirname}/models/`;
 
-async function FaceRec(firstPath, secondPath){
+async function FaceRec(firstPath, secondPath, FinalPath){
 
   await faceapi.nets.ssdMobilenetv1.loadFromDisk(MODEL_URL);
   await faceapi.nets.faceLandmark68Net.loadFromDisk(MODEL_URL);
   await faceapi.nets.faceRecognitionNet.loadFromDisk(MODEL_URL);
   
-  //L'immagine deve essere del tipo HTMLImageElement, quindi effettuo queste istruzioni per "convertirla"
+  //L'immagine deve essere del tipo HTMLImageElement, quindi effettuo queste istruzioni per "convertirla", inoltre il canvas
+  // serve per poi scrivere l'immagine finale
   const firstImage = await canvas.loadImage(firstPath);
   const firstSize = sizeOf(firstPath);
   const firstWidth = firstSize.width;
@@ -55,7 +56,7 @@ async function FaceRec(firstPath, secondPath){
   finalCtx.textAlign = "center";
   finalCtx.fillText(dist + "%", firstWidth, firstHeight * 9/10);
   const buffer = finalImg.toBuffer('image/png');
-  fs.writeFileSync(`${__dirname}/images/Final.png`, buffer);
+  fs.writeFileSync(FinalPath, buffer);
 }
 
 module.exports = { FaceRec };

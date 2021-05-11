@@ -9,7 +9,6 @@ const passport = require("passport");
 const websocket = require("ws");
 const keys = require("./config/keys");
 const path = require("path");
-const { spawn } = require("child_process");
 const fr = require("./FaceRec.js");
 const fs = require("fs");
 var formidable = require("formidable");
@@ -86,17 +85,14 @@ app.get("/upload", function (req, res) {
       "Uploading...<br>Meanwhile, return to the <button onclick='window.location.href=\"/\"'>homepage</button>"
     );
     var a_t = req.cookies.googleToken.token;
-    request.post("http://localhost:3000/upload/googleDrive?a_t=" + a_t);
+    var imPath = req.cookies.ImagePath;
+    request.post("http://localhost:3000/upload/googleDrive?a_t=" + a_t+ "&imPath=" + imPath);
   }
 });
 
 app.post("/upload/googleDrive", function (req, res) {
-  googleApi.GoogleDrive(
-    "DeCocco",
-    path.join(__dirname, "/images/DeCocco.jpg"),
-    req,
-    res
-  );
+  var imPath = req.query.imPath;
+  googleApi.GoogleDrive("YourResult", imPath, req, res);
 });
 
 app.get("/logout/google", function (req, res) {
@@ -176,28 +172,31 @@ app.post("/FaceRec", function (req, res) {
   var newpathSecond;
   form.parse(req, function (err, fields, files) {
     var oldpath = files.First.path;
-    newpathFirst = path.join(__dirname, "/images/") + files.First.name;
+    var FirstName = files.First.name;
+    newpathFirst = path.join(__dirname, "/images/") + FirstName;
     fs.rename(oldpath, newpathFirst, function (err) {
       if (err) throw err;
     });
     oldpath = files.Second.path;
-    newpathSecond = path.join(__dirname, "/images/") + files.Second.name;
+    var SecondName = files.Second.name;
+    newpathSecond = path.join(__dirname, "/images/") + SecondName;
     fs.rename(oldpath, newpathSecond, function (err) {
       if (err) throw err;
     });
-
-    fr.FaceRec(newpathFirst, newpathSecond)
+    FinalName = (Math.floor(Math.random() * (9999 - 1000) + 1000)).toString() + path.parse(FirstName).name + SecondName;
+    FinalPath = path.join(__dirname, "/images/") + FinalName;
+    fr.FaceRec(newpathFirst, newpathSecond, FinalPath)
       .then((result) => {
         fs.unlinkSync(newpathFirst);
         fs.unlinkSync(newpathSecond);
         console.log("Finito!");
+        res.cookie("ImagePath", FinalPath);
+        res.redirect("/");
       })
       .catch((err) => {
         console.log(err);
       });
   });
-
-  res.redirect("/");
 });
 
 server.listen(3000, () => {

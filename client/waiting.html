@@ -35,14 +35,5 @@
       <div id="chat"></div>
       <textarea id="text_area" onkeypress="send_message(event)"></textarea>
     </div>
-    <div id="img_upload">
-      <form action="/FaceRec" method="POST" enctype="multipart/form-data">
-        <label for="First">First face:</label>
-        <input type="file" name="First" id="First" /><br/>
-        <label for="Second">Second face:</label>
-        <input type="file" name="Second" id="Second" /><br/>
-        <input type="submit" name="submit" value="Submit" onclick="window.location.href='./waiting.html'"/>
-      </form>
-    </div>
   </body>
 </html>
