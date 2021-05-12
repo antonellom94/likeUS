@@ -51,8 +51,9 @@ app.get("/", function (req, res) {
 
   //Controllo se in questa sessione sia stato eseguito almeno una volta il FaceRec
   if(cookies.ImagePath){
-    var googleButton =
-      "<br>Press this to upload your image to <button onclick='window.location.href=\"/auth/google\"'>Drive</button>";
+    if(fs.existsSync(cookies.ImagePath))
+      var googleButton =
+        "<br>Press this to upload your image to <button onclick='window.location.href=\"/auth/google\"'>Drive</button>";
 
     //Controllo se è già presente un token di google, in caso controllo la scadenza
     if (cookies.googleToken)
@@ -90,9 +91,13 @@ app.get("/auth/google/callback", function (req, res) {
 
 app.get("/upload", function (req, res) {
   var cookies = req.cookies;
-
+  //Ogni ora i file vengono eliminati, quindi bisogna controllare
+  if(!(fs.existsSync(cookies.ImagePath))){
+    res.clearCookie("ImagePath");
+    res.send("Your file expired! <br>Come back to <button onclick='window.location.href=\"/home\"'>here</button>")
+  }
   //Controllo di nuovo se il token è scaduto per evitare problemi
-  if (cookies.googleToken.expire_time < Date.now())
+  else if (cookies.googleToken.expire_time < Date.now())
     res.send(
       "Your token expired!<br>You can, return to the <button onclick='window.location.href=\"/\"'>homepage</button>" +
         " or you can try to <button onclick='window.location.href=\"/auth/google\"'>login</button>"
