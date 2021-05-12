@@ -37,16 +37,14 @@ function GoogleToken(req, res, code){
     }
     console.log('Upload successful!\nServer responded with:', body);
     var info = JSON.parse(body);
+    //Imposto il token in modo che risulti la data di scadenza
     a_t = {
             'token' : info.access_token,
-            'expire_time' : Date.now() - info.expires_in * 1000 //Millisecondi
+            'expire_time' : Date.now() + info.expires_in * 1000 //Millisecondi
           };
     res.cookie("googleToken", a_t);
     res.redirect("/upload");
   });
 }
 
-function getToken() {
-  return a_t;
-}
-module.exports = { GoogleAccess, GoogleToken, getToken };
+module.exports = { GoogleAccess, GoogleToken};

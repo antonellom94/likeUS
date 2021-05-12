@@ -1,6 +1,5 @@
 const fs = require('fs');
 const request = require('request');
-const googleAuth = require("../auth/googleAuth");
 
 //Tramite il token viene usata l'api per caricare l'mmagine fileName in filePath sulla directory Root dell'account di Google Drive
 function GoogleDrive(fileName, filePath, req, res){

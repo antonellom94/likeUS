@@ -6,6 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="./assets/style/index.css" />
     <script src="./assets/script/index.js"></script>
+    <script>
+      function Redir() {
+        window.location.href = '/waiting';
+      }
+    </script>
     <title>likeUS</title>
   </head>
   <body onload="start_ws()">
@@ -34,6 +39,15 @@
       </button>
       <div id="chat"></div>
       <textarea id="text_area" onkeypress="send_message(event)"></textarea>
+    </div>
+    <div id="img_upload">
+      <form target="_blank" action="/FaceRec" method="POST" enctype="multipart/form-data">
+        <label for="First">First face:</label>
+        <input type="file" name="First" id="First" /><br/>
+        <label for="Second">Second face:</label>
+        <input type="file" name="Second" id="Second" /><br/>
+        <input type="submit" name="submit" value="Submit"/>
+      </form>
     </div>
   </body>
 </html>

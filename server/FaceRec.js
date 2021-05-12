@@ -9,12 +9,12 @@ const MODEL_URL = `${__dirname}/models/`;
 
 async function FaceRec(firstPath, secondPath, FinalPath){
 
+  //Carico i modelli di faceapi utili per lo scopo
   await faceapi.nets.ssdMobilenetv1.loadFromDisk(MODEL_URL);
   await faceapi.nets.faceLandmark68Net.loadFromDisk(MODEL_URL);
   await faceapi.nets.faceRecognitionNet.loadFromDisk(MODEL_URL);
   
-  //L'immagine deve essere del tipo HTMLImageElement, quindi effettuo queste istruzioni per "convertirla", inoltre il canvas
-  // serve per poi scrivere l'immagine finale
+  //L'immagine deve essere del tipo HTMLImageElement, quindi effettuo queste istruzioni per "convertirla" in un formato accettato
   const firstImage = await canvas.loadImage(firstPath);
   const firstSize = sizeOf(firstPath);
   const firstWidth = firstSize.width;
@@ -43,10 +43,12 @@ async function FaceRec(firstPath, secondPath, FinalPath){
   const dist = ((1 - faceapi.euclideanDistance(firstDescr, secondDescr))*100).toFixed(2);
   console.log(dist);  
  
+  //Calcolo le dimensioni dell'immagine finale
   const secondWidth_afterResize = (secondWidth/secondHeight) * firstHeight;
   const finalImg = canvas.createCanvas(firstWidth + secondWidth_afterResize, firstHeight);
   const finalCtx = finalImg.getContext('2d');
   finalCtx.drawImage(firstImage, 0, 0, firstWidth, firstHeight);
+  //La versione estesa del drawImage consente di impostare posizione e dimensione finale dell'immagine da disegnare nel canvas
   finalCtx.drawImage(secondImage, 0, 0, secondWidth, secondHeight, firstWidth, 0, secondWidth_afterResize, firstHeight);
   //Nel font va indicata la grandezza, per questo concateno la grandezza voluta con px nomefont
   const mySize = firstHeight/5;
