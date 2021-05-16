@@ -1,13 +1,14 @@
 const express = require('express')
 const axios = require('axios').default
 const keys = require('../config/keys')
+const session = require('express-session');
 const port = 3000
 
 const STATE = "OauthMiFaSchifo"
 
 const request_uri = 'https://www.facebook.com/v10.0/dialog/oauth?client_id='+
 keys.APP_ID+'&redirect_uri=http://localhost:3000/page&state='+
-STATE+"&scope=user_photos,user_posts"
+STATE+"&scope=user_photos,user_posts,"
 var TESTER_TOKEN = "EAADZB9KGeMxEBAHvjjzkIRl6ZCu3WoK3JxQhjCeseum8Y3g0JIC5m9qHjBbsNaZAp2MhzSF1IZBZBZCN5uyAWkNnHTu50TW6oIZAzb07d260ZAMZAgzh7IVyZB7pv8sUctFjOUjtUDKg44EsUxeCI4L99v5Duf3SdZAxHPrQMfzpVa1s70uZAPMZCQ09HgQydtdAfpvIVgdmvAqbF7B6GMqjRmgrg"
 var TOKEN = ""
 //creazione istanza express
@@ -39,9 +40,7 @@ prova1.get('/page', (req, res) => {
         .then(risposta_dio =>{
             TOKEN = risposta_dio.data.access_token
             
-            res.send('<a href="http://localhost:3000/get_posts"><button>ricevi informazioni sui post</button></a>'+
-            '<a href="http://localhost:3000/get_photos"><button>ricevi informazioni sulle foto</button></a>'+
-            '<a href="http://localhost:3000/post_something"><button>Click here to post something on facebook</button></a>')
+            res.send('<a href="http://localhost:3000/get_profile_picture"><button>ricevi informazioni sulle foto</button></a>')
         })//tutto a buon fine, manda il token al browser
         .catch(err => console.log('errore: '+err));//c'è stato un errore stanpa l'errore
     }
@@ -49,33 +48,12 @@ prova1.get('/page', (req, res) => {
         res.send("Autenticazione compromessa");
     }
 })
-//chiamata api posts
-prova1.get('/get_posts', (req, res) => {
-    console.log(req.session)
-    console.log(req.get("Cookie"))
-    axios.get('https://graph.facebook.com/me/feed?access_token='+TOKEN)
+
+//chiamata api foto profilo
+prova1.get('/get_profile_picture', (req, res) => {
+    axios.get('https://graph.facebook.com/me/picture?height=200&width=200&redirect=0&access_token='+TOKEN)
     .then(api_res => {
-        res.send(api_res.data)
-    })
-    .catch(err => {
-        res.send(err.status)
-    })
-})
-//chiamata api foto
-prova1.get('/get_photos', (req, res) => {
-    axios.get('https://graph.facebook.com/me/photos?access_token='+TOKEN)
-    .then(api_res => {
-        res.send(api_res.data)
-    })
-    .catch(err => {
-        res.send(err)
-    })
-})
-// chiamata api per postare su facebook (Non funziona finchè non mi approvano l'app dio ***)
-prova1.get('/post_something', (req, res) => {
-    axios.post('https://graph.facebook.com/me/feed?message=This post was published by Nodejs&access_token='+TOKEN)
-    .then(risp => {
-        res.send("Message correctly posted:"+risp.data)
+        res.redirect(api_res.data.data.url)
     })
     .catch(err => {
         res.send(err)
