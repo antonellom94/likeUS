@@ -1,36 +1,13 @@
-const express = require('express')
 const axios = require('axios').default
 const keys = require('../config/keys')
-const session = require('express-session');
-const port = 3000
 
 const STATE = "OauthMiFaSchifo"
 
 const request_uri = 'https://www.facebook.com/v10.0/dialog/oauth?client_id='+
-keys.APP_ID+'&redirect_uri=http://localhost:3000/page&state='+
-STATE+"&scope=user_photos,user_posts,"
-var TESTER_TOKEN = "EAADZB9KGeMxEBAHvjjzkIRl6ZCu3WoK3JxQhjCeseum8Y3g0JIC5m9qHjBbsNaZAp2MhzSF1IZBZBZCN5uyAWkNnHTu50TW6oIZAzb07d260ZAMZAgzh7IVyZB7pv8sUctFjOUjtUDKg44EsUxeCI4L99v5Duf3SdZAxHPrQMfzpVa1s70uZAPMZCQ09HgQydtdAfpvIVgdmvAqbF7B6GMqjRmgrg"
-var TOKEN = ""
-//creazione istanza express
-const prova1 = express()
-prova1.use(session({
-    secret: "keyboard cat",
-    name: "Awanagana",
-    saveUninitialized: true,
-    resave: false,
-})
-);
+keys.APP_ID+'&redirect_uri=http://localhost:3000/home&state='+
+STATE+"&scope=user_photos,user_posts"
 
-//Pagina principale da cui accedo a facebook, nella pagina c'è un bottone che fa una chiamata GET alla risorsa /login che reindirizza al login di FaceBook
-prova1.get('/', (req, res) => {
-    res.send('<a href="http://localhost:3000/login"><button>Accedi a Facebook</button></a>')
-});
-
-//redirect della pagina al login di facebook, una volta fatto il login il browser automaticamente chiamma la GET http://localhost:3000/page
-prova1.get('/login', (req, res) => {
-    res.redirect(request_uri)
-});
-
+/*
 prova1.get('/page', (req, res) => {
     if(req.query.state === STATE){// il parametro state è semplicemente un altra forma di sicurezza aggiuntiva che sto usando male oltretutto: ignoratelo
         //Faccio la richiesta per il token passando come parametro il code che mi è stato passatto dal redirect
@@ -48,9 +25,8 @@ prova1.get('/page', (req, res) => {
         res.send("Autenticazione compromessa");
     }
 })
-
-//chiamata api foto profilo
-prova1.get('/get_profile_picture', (req, res) => {
+*/
+module.exports.get_profile_picture = function(req,res){
     axios.get('https://graph.facebook.com/me/picture?height=200&width=200&redirect=0&access_token='+TOKEN)
     .then(api_res => {
         res.redirect(api_res.data.data.url)
@@ -58,6 +34,8 @@ prova1.get('/get_profile_picture', (req, res) => {
     .catch(err => {
         res.send(err)
     })
-})
+}
 
-prova1.listen(3000)
+module.exports.facebook_auth = function(req, res){
+    res.redirect(request_uri)
+}

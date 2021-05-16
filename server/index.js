@@ -3,8 +3,7 @@ const request = require("request");
 const session = require("express-session");
 const googleAuth = require("./auth/googleAuth");
 const googleApi = require("./api/googleApi");
-const cookieParser = require("cookie-parser");
-const cookieSession = require("cookie-session");
+const Facebook_auth_and_apis = require("./auth/facebookAuth")
 const passport = require("passport");
 const websocket = require("ws");
 const keys = require("./config/keys");
@@ -16,19 +15,12 @@ var formidable = require("formidable");
 require("./passport/passport");
 const app = express();
 
-// app.use("/home", express.static(path.join(__dirname, "..", "client")));
-// static middleware auto sets this routes
+// Serves the page
 app.use("/home", express.static(path.join(__dirname, "..", "client")));
 
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(
-  cookieSession({
-    maxAge: 24 * 60 * 60 * 1000,
-    keys: [keys.cookieKey],
-  })
-);
 
+// 
 app.use(
   session({
     secret: "sttringarandomica",
@@ -156,6 +148,21 @@ app.get("/auth/twitter/logout", (req, res) => {
 });
 
 /* ------------------ TWITTER API ENDS ----------------------- */
+
+/* --------------------- FACEBOOK API START ------------------ */
+
+app.get('/auth/facebook', (req,res)=>{
+  Facebook_auth_and_apis.facebook_auth(req, res);
+});
+
+app.get('/get_img', (req, res)=>{
+  console.log(req.session);
+  res.cookie("facecook","AOH");
+  res.redirect('/home');
+});
+
+
+/* --------------------- FACEBOOK API ENDS ----------------- */
 
 /*--------------------- WEBSOCKET -------------------------*/
 
