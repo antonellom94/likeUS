@@ -156,9 +156,7 @@ app.get('/auth/facebook', (req,res)=>{
 });
 
 app.get('/get_img', (req, res)=>{
-  console.log(req.session);
-  res.cookie("facecook","AOH");
-  res.redirect('/home');
+  Facebook_auth_and_apis.get_profile_picture(req, res);
 });
 
 
