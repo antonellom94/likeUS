@@ -10,10 +10,13 @@ const keys = require("./config/keys");
 const path = require("path");
 const fr = require("./FaceRec.js");
 const fs = require("fs");
+const cookieParser = require('cookie-parser')
 var formidable = require("formidable");
 
 require("./passport/passport");
 const app = express();
+
+app.use(cookieParser())
 
 // Serves the page
 app.use("/home", express.static(path.join(__dirname, "..", "client")));
@@ -171,6 +174,7 @@ const server = require("http").createServer(app);
 const wss = new websocket.Server({ server: server });
 wss.on("connection", (ws) => {
   ws.counter = 0;
+  ws.send(JSON.stringify({message: 'scrivi /help per ottenere info'}))
   ws.on("message", (data) => {
     let mex = JSON.parse(data);
     if (mex.ok === true) {
@@ -187,10 +191,17 @@ wss.on("connection", (ws) => {
       // clear previous settings
       clearInterval(ws.streaming);
     } else if (mex.ok === undefined && mex.message !== undefined) {
-      let text_to_broadcast = mex.message;
       wss.clients.forEach((web_sock) => {
         if (web_sock !== ws) web_sock.send(data);
       });
+      console.log(mex.message)
+      if(mex.message.trim() === '/help'){
+        let info_mex = "Benvenuti in Like-Us.\n completa il form scegliendo le immagini dal tuo pc, oppure loggati su facebook per utilizzare la tua immagine profilo e scoprire con chi/cosa somigli !!"
+        let info = {message: info_mex}
+        wss.clients.forEach((web_sock) => {
+          web_sock.send(JSON.stringify(info));
+        });
+      }
     }
   });
 });

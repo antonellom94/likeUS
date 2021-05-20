@@ -15,12 +15,14 @@ module.exports.get_profile_picture = function(req,res){
         '&client_secret='+keys.SECRET+'&code='+req.query.code+
         '&redirect_uri='+request_uri)// Il redirect_uri deve essere proprio il request_uri utilizzato nel passo precedente come redirect per permettere il login
         .then(res_token => {
-            return axios.get('https://graph.facebook.com/me/picture?height=200&width=200&&access_token='+res_token.data.access_token) // API call to get profile image
+            return axios.get('https://graph.facebook.com/me/picture?height=200&width=200&access_token='+res_token.data.access_token) // API call to get profile image
         })
         .then(profile_picture_res => {
-            fs.writeFile('../immagine.jpg', profile_picture_res.data, {encoding: 'utf-8'}, (ok) =>{
-                res.send('Immagine prelevata');
-            } );
+            let buf = Buffer.from(profile_picture_res.data)
+            console.log(buf)
+            fs.writeFile('./prof.jpg', buf , ()=>{
+                res.send("Immagine prelevata")
+            })
         })
         .catch(err => {console.log(err); res.send('Si è verificato un errore')});    // Se c'è stato un errore stanpa l'errore
     }
