@@ -15,6 +15,7 @@ var formidable = require("formidable");
 
 require("./passport/passport");
 const app = express();
+var FACERECWSCOMUNICATION = null;
 
 app.use(cookieParser())
 
@@ -177,6 +178,10 @@ wss.on("connection", (ws) => {
   ws.send(JSON.stringify({message: 'scrivi /help per ottenere info'}))
   ws.on("message", (data) => {
     let mex = JSON.parse(data);
+    // Check if it is faceReck
+    if(mex.auth === "FaceRec" && mex.init !== undefined && mex.init === true){
+      FACERECWSCOMUNICATION = ws;
+    }
     if (mex.ok === true) {
       //Send color
       ws.send(JSON.stringify({ color: colors[ws.counter % colors.length] }));
@@ -221,12 +226,19 @@ app.post("/FaceRec", function (req, res) {
     fs.rename(oldpath, newpathFirst, function (err) {
       if (err) throw err;
     });
+
+    var first_img = fs.readFileSync(oldpath).toString('utf-8');
     oldpath = files.Second.path;
     var SecondName = files.Second.name;
     var newpathSecond = path.join(__dirname, "/images/") + SecondName;
     fs.rename(oldpath, newpathSecond, function (err) {
       if (err) throw err;
     });
+    var second_img = fs.readFileSync(oldpath).toString('utf-8');
+
+    FACERECWSCOMUNICATION.send(JSON.stringify({}))
+
+
     //Per il path dell'immagine risultante unisco i nomi delle due inserite e un numero tra 1000 e 9999 per cercare unicità
     FinalName = (Math.floor(Math.random() * (9999 - 1000) + 1000)).toString() + path.parse(FirstName).name + SecondName;
     FinalPath = path.join(__dirname, "/images/") + FinalName;
