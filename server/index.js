@@ -231,7 +231,7 @@ app.post("/FaceRec", function (req, res) {
     //Per il path dell'immagine risultante unisco i nomi delle due inserite e un numero tra 1000 e 9999 per cercare unicità
     FinalName = (Math.floor(Math.random() * (9999 - 1000) + 1000)).toString() + path.parse(FirstName).name + SecondName;
     FinalPath = path.join(__dirname, "/images/") + FinalName;
-
+/*
     //Per il FaceRec passo le due immagini di base e il path del risultato, una volta finito elimino le vecchie immagine e imposto il cookie
     fr.FaceRec(newpathFirst, newpathSecond, FinalPath)
       .then((result) => {
@@ -251,7 +251,11 @@ app.post("/FaceRec", function (req, res) {
       .catch((err) => {
         console.log(err);
       });
+
+      res.redirect("/");
+      */
   });
+
 });
 
 /*-----------------CLEAR SERVER----------------- */
