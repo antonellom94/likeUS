@@ -227,7 +227,6 @@ app.post("/FaceRec", function (req, res) {
     fs.rename(oldpath, newpathSecond, function (err) {
       if (err) throw err;
     });
-
     //Per il path dell'immagine risultante unisco i nomi delle due inserite e un numero tra 1000 e 9999 per cercare unicità
     FinalName = (Math.floor(Math.random() * (9999 - 1000) + 1000)).toString() + path.parse(FirstName).name + SecondName;
     FinalPath = path.join(__dirname, "/images/") + FinalName;

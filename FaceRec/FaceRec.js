@@ -2,6 +2,7 @@ const faceapi = require('face-api.js');
 const canvas = require('canvas');
 const sizeOf = require('image-size');
 const fs = require('fs');
+const ws = require('ws');
 
 const { Canvas, Image, ImageData } = canvas;
 faceapi.env.monkeyPatch({ Canvas, Image, ImageData });
@@ -59,6 +60,7 @@ async function FaceRec(firstPath, secondPath, FinalPath){
   finalCtx.fillText(dist + "%", firstWidth, firstHeight * 9/10);
   const buffer = finalImg.toBuffer('image/png');
   fs.writeFileSync(FinalPath, buffer);
+  
 }
 
 module.exports = { FaceRec };
