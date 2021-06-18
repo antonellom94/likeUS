@@ -72,7 +72,7 @@ web_sock.on("open", () => {
 web_sock.on("message", data => {
   let mex = JSON.parse(data);
   // process data ...
-  if(mex.first !== undefined && mex.second !== undefined){
+  if(mex.first !== undefined && mex.second !== undefined && mex.corrId !== undefined){
     fs.writeFileSync("./first.jpg", mex.first, 'binary');
     fs.writeFileSync("./second.jpg", mex.second, 'binary');
     web_sock.send(JSON.stringify({processed: true, result: "hola bebe", corrID: mex.corrID}));
