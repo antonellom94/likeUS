@@ -23,7 +23,7 @@ async function FaceRec(firstSource, secondSource){
   const firstImg = canvas.createCanvas(firstWidth, firstHeight);
   const firstCtx = firstImg.getContext('2d');
   firstCtx.drawImage(firstImage, 0, 0, firstWidth, firstHeight);
-/*
+
   const secondImage = await canvas.loadImage(secondSource);
   const secondSize = sizeOf(secondSource);
   const secondWidth = secondSize.width;
@@ -61,10 +61,10 @@ async function FaceRec(firstSource, secondSource){
   const buffer = finalImg.toBuffer('image/png');
   return buffer.toString('binary');
 
-*/
+/*
 console.log("finito");
   const buffer = firstImg.toBuffer('image/png');
-  return buffer.toString('binary');
+  return buffer.toString('binary');*/
 }
 
 // Web socket connesso all'application server
