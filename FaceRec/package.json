@@ -1,19 +1,8 @@
 {
-  "name": "facerec",
-  "version": "1.0.0",
-  "description": "FaceRec modules",
-  "main": "FaceRec.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "Fabrikh",
-  "license": "ISC",
   "dependencies": {
     "@tensorflow/tfjs-node": "^3.7.0",
-    "@vladmandic/face-api": "^1.3.1",
     "canvas": "^2.8.0",
     "face-api.js": "^0.22.2",
-    "fs": "*",
     "image-size": "^1.0.0",
     "ws": "^7.5.0"
   }

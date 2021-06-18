@@ -8,7 +8,12 @@ function start_ws() {
     let mex = JSON.parse(event.data);
     if(mex.processed !== undefined && mex.processed === true && mex.result !== undefined){
       document.getElementById("Submit").disabled = false;
-      alert(mex.result)
+      if(mex.result === "There are no recognizable faces")
+        alert(mex.result)
+      else{
+        let source = "data:image/jpeg;base64,"+btoa(mex.result);
+        document.getElementById('finalimage').innerHTML = '<img src='+source+' width=200px> <a href="/">Condividi</a>';
+      }
     }
     else{
       if (mex.color !== undefined) {
@@ -47,6 +52,8 @@ function send_message(event) {
       text +
       "</div></div>";
     ws.send(JSON.stringify({ message: text }));
+
+    document.getElementById("gears").style.display = "inline";
   }
 }
 function clear_chat() {

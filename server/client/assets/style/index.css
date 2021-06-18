@@ -1,0 +1,206 @@
+.message-line {
+  width: 100%;
+  display: inline-block;
+  background-color: transparent;
+  padding: 5px;
+  margin: 0;
+}
+.message {
+  position: relative;
+  border: 2px solid;
+  border-radius: 10px 10px 10px 10px;
+  width: fit-content;
+  width: 80%;
+  height: auto;
+  margin-top: 2px;
+  word-wrap: break-word;
+}
+.mine {
+  border-bottom-right-radius: 0px;
+  background-color: cyan;
+  display: block;
+  float: right;
+  margin-right: 20px;
+}
+.others {
+  border-bottom-left-radius: 0px;
+  background-color: green;
+  display: block;
+  margin-left: 10px;
+}
+
+#chat_div {
+  border: 5px solid;
+  width: 400px;
+  height: 500px;
+  background-color: blue;
+  position: absolute;
+  top: 5%;
+  right: 5px;
+  border-radius: 5%;
+}
+
+#chat {
+  overflow-y: scroll;
+  position: relative;
+  height: 350px;
+  border-color: green;
+  border-radius: 2px;
+  border: 3px solid;
+  background-color: white;
+  top: 30px;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  overflow-x: hidden;
+}
+
+#text_area {
+  position: absolute;
+  width: 95%;
+  margin-left: 2%;
+  border: 2px thin;
+  bottom: 2px;
+  resize: unset;
+}
+
+
+
+
+.gears {
+  width: 350px;
+  margin: 100px auto;
+  display: none;
+  text-align: center;
+  font-weight: bold;
+  font-family: Arial;
+  color: #fff;
+  text-shadow: 1px 1px 2px #5F868A
+}
+
+.gears .big {
+  width: 100px;
+  height: 100px;
+  -webkit-transform-origin: center;
+  -moz-transform-origin: center;
+  -o-transform-origin: center;
+  transform-origin: center;
+  -webkit-animation: rotate 1.5s linear infinite;
+  -moz-animation: rotate 1.5s linear infinite;
+  -o-animation: rotate 1.5s linear infinite;
+  animation: rotate 1.5s linear infinite
+}
+
+.gears .small {
+  width: 70px;
+  height: 70px;
+  margin-left: -6px;
+  -webkit-transform-origin: center;
+  -moz-transform-origin: center;
+  -o-transform-origin: center;
+  transform-origin: center;
+  -webkit-animation: reverseRotate 1.5s linear infinite;
+  -moz-animation: reverseRotate 1.5s linear infinite;
+  -o-animation: reverseRotate 1.5s linear infinite;
+  animation: reverseRotate 1.5s linear infinite;
+}
+
+
+@-webkit-keyframes rotate {
+  0% {
+     -webkit-transform: rotate(0);
+     transform: rotate(0);
+  }
+  100% {
+     -webkit-transform: rotate(180deg);
+     transform: rotate(180deg);
+  }
+}
+
+
+@-moz-keyframes rotate {
+  0% {
+     -moz-transform: rotate(0);
+     transform: rotate(0);
+  }
+  100% {
+     -moz-transform: rotate(180deg);
+     transform: rotate(180deg);
+  }
+}
+
+
+@-o-keyframes rotate {
+  0% {
+     -o-transform: rotate(0);
+     transform: rotate(0);
+  }
+  100% {
+     -o-transform: rotate(180deg);
+     transform: rotate(180deg);
+  }
+}
+
+
+@keyframes rotate {
+  0% {
+     -webkit-transform: rotate(0);
+     -moz-transform: rotate(0);
+     -o-transform: rotate(0);
+     transform: rotate(0);
+  }
+  100% {
+     -webkit-transform: rotate(180deg);
+     -moz-transform: rotate(180deg);
+     -o-transform: rotate(180deg);
+     transform: rotate(180deg);
+  }
+}
+
+@-webkit-keyframes reverseRotate {
+  0% {
+     -webkit-transform: rotate(180deg);
+     transform: rotate(180deg);
+  }
+  100% {
+     -webkit-transform: rotate(0);
+     transform: rotate(0);
+  }
+}
+
+@-moz-keyframes reverseRotate {
+  0% {
+     -moz-transform: rotate(180deg);
+     transform: rotate(180deg);
+  }
+  100% {
+     -moz-transform: rotate(0);
+     transform: rotate(0);
+  }
+}
+
+@-o-keyframes reverseRotate {
+  0% {
+     -o-transform: rotate(180deg);
+     transform: rotate(180deg);
+  }
+  100% {
+     -o-transform: rotate(0);
+     transform: rotate(0);
+  }
+}
+
+@keyframes reverseRotate {
+  0% {
+     -webkit-transform: rotate(180deg);
+     -moz-transform: rotate(180deg);
+     -o-transform: rotate(180deg);
+     transform: rotate(180deg);
+  }
+  100% {
+     -webkit-transform: rotate(0);
+     -moz-transform: rotate(0);
+     -o-transform: rotate(0);
+     transform: rotate(0);
+  }
+}

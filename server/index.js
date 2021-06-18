@@ -20,7 +20,7 @@ var FACERECWSCOMUNICATION = null;
 app.use(cookieParser())
 
 // Serves the page
-app.use("/home", express.static(path.join(__dirname, "..", "client")));
+app.use("/home", express.static(path.join(__dirname,"client")));
 
 app.use(express.urlencoded({ extended: false }));
 
@@ -65,11 +65,6 @@ app.get("/", function (req, res) {
   } else {
     res.send("Nothing to do here, but you can go <button onclick='window.location.href=\"/home\"'>here</button>");
   }
-});
-
-//In teoria dovrebbe fare da waiting room, ma ancora non va del tutto
-app.get("/waiting", function (req, res) {
-  res.sendFile(path.resolve(__dirname + "/../client/waiting.html"));
 });
 
 /* ------------------ GOOGLE API START ----------------------- */
@@ -285,38 +280,6 @@ app.post("/FaceRec", function (req, res) {
   });
 
 });
-
-/*-----------------CLEAR SERVER----------------- */
-
-//Per evitare di intasare il server, eseguo ogni tot. di tempo una pulizia dalle immagini considerate vecchie
-//In questo caso elimino ogni 10 minuti le immagini che non vengono modificate da più di un'oras
-function Remove(){
-  var imPath = path.join(__dirname,'/images');
-
-  //Controllo tutti i files all'interno della cartella delle immagini
-  fs.readdir(imPath, (err, files) => {
-    files.forEach(file => {
-      var thisimage = path.join(imPath, file);
-
-      //Per ogni file controllo i suoi attributi, in questo caso serve la data dell'ultima modifica
-      fs.stat(thisimage, (err, stats) => {
-        if(err) {
-            throw err;
-        }
-        let milliseconds = (new Date().getTime() - stats.mtime);
-
-        //Se il file è da considerare vecchio, lo elimino
-        if(milliseconds > 60*60*1000){
-          console.log("Older than one hour, deleting..."); 
-          fs.unlinkSync(thisimage);
-        }
-      });      
-    });
-  });
-}
-
-//Ripeto la pulizia della cartella ogni tot. millisecondi
-setInterval(Remove, 10*60*1000);
 
 
 server.listen(3000, () => {

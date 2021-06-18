@@ -1,6 +1,6 @@
 version: "3.8"
 services:
-    nodeserver:
+    appserver:
         build:
             context: ./server
         ports:
@@ -10,9 +10,13 @@ services:
             context: ./FaceRec
         ports: 
             - "3001:3001"
+        depends_on: 
+            - "appserver"
     nginx:
         restart: always
         build:
             context: ./nginx
         ports:
             - "80:80"
+        depends_on: 
+            - "appserver"

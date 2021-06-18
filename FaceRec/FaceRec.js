@@ -8,7 +8,7 @@ const { Canvas, Image, ImageData } = canvas;
 faceapi.env.monkeyPatch({ Canvas, Image, ImageData });
 const MODEL_URL = `${__dirname}/models/`;
 
-async function FaceRec(firstPath, secondPath, FinalPath){
+async function FaceRec(firstSource, secondSource){
 
   //Carico i modelli di faceapi utili per lo scopo
   await faceapi.nets.ssdMobilenetv1.loadFromDisk(MODEL_URL);
@@ -16,16 +16,16 @@ async function FaceRec(firstPath, secondPath, FinalPath){
   await faceapi.nets.faceRecognitionNet.loadFromDisk(MODEL_URL);
   
   //L'immagine deve essere del tipo HTMLImageElement, quindi effettuo queste istruzioni per "convertirla" in un formato accettato
-  const firstImage = await canvas.loadImage(firstPath);
-  const firstSize = sizeOf(firstPath);
+  const firstImage = await canvas.loadImage(firstSource);
+  const firstSize = sizeOf(firstSource);
   const firstWidth = firstSize.width;
   const firstHeight = firstSize.height;
   const firstImg = canvas.createCanvas(firstWidth, firstHeight);
   const firstCtx = firstImg.getContext('2d');
   firstCtx.drawImage(firstImage, 0, 0, firstWidth, firstHeight);
-
-  const secondImage = await canvas.loadImage(secondPath);
-  const secondSize = sizeOf(secondPath);
+/*
+  const secondImage = await canvas.loadImage(secondSource);
+  const secondSize = sizeOf(secondSource);
   const secondWidth = secondSize.width;
   const secondHeight = secondSize.height;  
   const secondImg = canvas.createCanvas(secondWidth, secondHeight);
@@ -59,8 +59,12 @@ async function FaceRec(firstPath, secondPath, FinalPath){
   finalCtx.textAlign = "center";
   finalCtx.fillText(dist + "%", firstWidth, firstHeight * 9/10);
   const buffer = finalImg.toBuffer('image/png');
-  fs.writeFileSync(FinalPath, buffer);
-  
+  return buffer.toString('binary');
+
+*/
+console.log("finito");
+  const buffer = firstImg.toBuffer('image/png');
+  return buffer.toString('binary');
 }
 
 // Web socket connesso all'application server
@@ -72,10 +76,21 @@ web_sock.on("open", () => {
 web_sock.on("message", data => {
   let mex = JSON.parse(data);
   // process data ...
-  if(mex.first !== undefined && mex.second !== undefined && mex.corrId !== undefined){
-    fs.writeFileSync("./first.jpg", mex.first, 'binary');
-    fs.writeFileSync("./second.jpg", mex.second, 'binary');
-    web_sock.send(JSON.stringify({processed: true, result: "hola bebe", corrID: mex.corrID}));
+  if(mex.first !== undefined && mex.second !== undefined && mex.corrID !== undefined){
+    let firstPath = "./"+mex.corrID+"first.jpg";
+    let secondPath = "./"+mex.corrID+"second.jpg";
+    fs.writeFileSync(firstPath, mex.first, 'binary');
+    fs.writeFileSync(secondPath, mex.second, 'binary');
+    FaceRec(firstPath, secondPath)
+    .then(resp => {
+      fs.unlinkSync(firstPath);
+      fs.unlinkSync(secondPath);
+      if(resp === "NoFace")
+        web_sock.send(JSON.stringify({processed: true, result: "There are no recognizable faces", corrID: mex.corrID}));
+      else
+        web_sock.send(JSON.stringify({processed: true, result: resp, corrID: mex.corrID}));
+    });
+    
   }
 })
 web_sock.on("error", err => {
