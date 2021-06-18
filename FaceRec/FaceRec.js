@@ -63,4 +63,23 @@ async function FaceRec(firstPath, secondPath, FinalPath){
   
 }
 
+// Web socket connesso all'application server
+const web_sock = new ws("ws://localhost:3000/")
+web_sock.on("open", () => {
+    web_sock.send(JSON.stringify({auth: "FaceRec"}));
+    console.log("Connected to application server");
+})
+web_sock.on("message", data => {
+  let mex = JSON.parse(data);
+  // process data ...
+  if(mex.first !== undefined && mex.second !== undefined){
+    fs.writeFileSync("./first.jpg", mex.first, 'binary');
+    fs.writeFileSync("./second.jpg", mex.second, 'binary');
+    web_sock.send(JSON.stringify({processed: true, result: "hola bebe", corrID: mex.corrID}));
+  }
+})
+web_sock.on("error", err => {
+  console.log("il server si è disconnesso");
+})
+
 module.exports = { FaceRec };

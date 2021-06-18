@@ -8,9 +8,9 @@ const passport = require("passport");
 const websocket = require("ws");
 const keys = require("./config/keys");
 const path = require("path");
-const fr = require("./FaceRec.js");
 const fs = require("fs");
 const cookieParser = require('cookie-parser')
+const uuid = require("uuid");
 var formidable = require("formidable");
 
 require("./passport/passport");
@@ -175,37 +175,54 @@ const server = require("http").createServer(app);
 const wss = new websocket.Server({ server: server });
 wss.on("connection", (ws) => {
   ws.counter = 0;
+  ws.id = uuid.v4();
   ws.send(JSON.stringify({message: 'scrivi /help per ottenere info'}))
   ws.on("message", (data) => {
     let mex = JSON.parse(data);
-    // Check if it is faceReck
-    if(mex.auth === "FaceRec" && mex.init !== undefined && mex.init === true){
+    // Check if it is faceRec
+    if(mex.auth !== undefined && mex.auth === "FaceRec"){
       FACERECWSCOMUNICATION = ws;
+      console.log("FaceRec online");
     }
-    if (mex.ok === true) {
-      //Send color
-      ws.send(JSON.stringify({ color: colors[ws.counter % colors.length] }));
-      ws.counter++;
-      // set repetitive sendigs
-      ws.streaming = setInterval(() => {
+    // Incoming messages for processing images
+    else if(mex.processing !== undefined && mex.processing === true && mex.first !== undefined && mex.second !== undefined && FACERECWSCOMUNICATION !== null){
+      mex.corrID = ws.id;
+      // Forward this type of message to FaceRec
+      FACERECWSCOMUNICATION.send(JSON.stringify(mex));
+    }
+    // FaceRec response of processed image
+    else if(mex.processed !== undefined && mex.processed === true && mex.result !== undefined && mex.corrID !== undefined){
+      // Forword only to client who asker for it using corrID
+      wss.clients.forEach((web_sock) => {
+        if (web_sock.id === mex.corrID) web_sock.send(data);
+      });
+    }
+    else{
+      if (mex.ok === true) {
+        //Send color
         ws.send(JSON.stringify({ color: colors[ws.counter % colors.length] }));
         ws.counter++;
-      }, 500);
-    }
-    if (mex.ok === false) {
-      // clear previous settings
-      clearInterval(ws.streaming);
-    } else if (mex.ok === undefined && mex.message !== undefined) {
-      wss.clients.forEach((web_sock) => {
-        if (web_sock !== ws) web_sock.send(data);
-      });
-      console.log(mex.message)
-      if(mex.message.trim() === '/help'){
-        let info_mex = "Benvenuti in Like-Us.\n completa il form scegliendo le immagini dal tuo pc, oppure loggati su facebook per utilizzare la tua immagine profilo e scoprire con chi/cosa somigli !!"
-        let info = {message: info_mex}
+        // set repetitive sendigs
+        ws.streaming = setInterval(() => {
+          ws.send(JSON.stringify({ color: colors[ws.counter % colors.length] }));
+          ws.counter++;
+        }, 500);
+      }
+      if (mex.ok === false) {
+        // clear previous settings
+        clearInterval(ws.streaming);
+      } else if (mex.ok === undefined && mex.message !== undefined) {
         wss.clients.forEach((web_sock) => {
-          web_sock.send(JSON.stringify(info));
+          if (web_sock !== ws) web_sock.send(data);
         });
+        console.log(mex.message)
+        if(mex.message.trim() === '/help'){
+          let info_mex = "Benvenuti in Like-Us.\n completa il form scegliendo le immagini dal tuo pc, oppure loggati su facebook per utilizzare la tua immagine profilo e scoprire con chi/cosa somigli !!"
+          let info = {message: info_mex}
+          wss.clients.forEach((web_sock) => {
+            web_sock.send(JSON.stringify(info));
+          });
+        }
       }
     }
   });

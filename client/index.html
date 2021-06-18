@@ -41,14 +41,12 @@
       <textarea id="text_area" onkeypress="send_message(event)"></textarea>
     </div>
     <div id="img_upload">
-      <a href='http://localhost:3000/auth/facebook'</a><button>Use your facebook profile image</button></a>
-      <form target="_blank" action="/FaceRec" method="POST" enctype="multipart/form-data">
-        <label for="First">First face:</label>
-        <input type="file" name="First" id="First" /><br/>
-        <label for="Second">Second face:</label>
-        <input type="file" name="Second" id="Second" /><br/>
-        <input type="submit" name="submit" value="Submit""/>
-      </form>
+      <a href='http://localhost:3000/auth/facebook'</a><button>Use your facebook profile image</button></a><br/>
+      <label for="First">First face:</label>
+      <input type="file" name="First" id="First" /><br/>
+      <label for="Second">Second face:</label>
+      <input type="file" name="Second" id="Second" /><br/>
+      <button id="Submit" onclick="sendImages()">Submit</button>
     </div>
   </body>
 </html>

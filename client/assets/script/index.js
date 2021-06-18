@@ -6,16 +6,22 @@ function start_ws() {
 
   ws.onmessage = (event) => {
     let mex = JSON.parse(event.data);
-    if (mex.color !== undefined) {
-      if (counter >= 10) {
-        esegui();
-      } else {
-        document.getElementById("RGB_Button").style.backgroundColor = mex.color;
-        counter++;
+    if(mex.processed !== undefined && mex.processed === true && mex.result !== undefined){
+      document.getElementById("Submit").disabled = false;
+      alert(mex.result)
+    }
+    else{
+      if (mex.color !== undefined) {
+        if (counter >= 10) {
+          esegui();
+        } else {
+          document.getElementById("RGB_Button").style.backgroundColor = mex.color;
+          counter++;
+        }
+      } else if (mex.color === undefined && mex.message !== undefined) {
+        document.getElementById("chat").innerHTML +=
+          "<div class='message others'>" + mex.message + "<div>";
       }
-    } else if (mex.color === undefined && mex.message !== undefined) {
-      document.getElementById("chat").innerHTML +=
-        "<div class='message others'>" + mex.message + "<div>";
     }
   };
 }
@@ -45,4 +51,37 @@ function send_message(event) {
 }
 function clear_chat() {
   document.getElementById("chat").innerHTML = "";
+}
+async function readFile(path){
+  return new Promise((resolve, reject)=>{
+    let reader = new FileReader();
+    reader.readAsBinaryString(path);
+    reader.onload = ev => {
+      resolve(ev.target.result);
+    }
+    reader.onerror = err => {
+      reject(err);
+    }
+  })
+}
+function sendImages(){
+  let first = document.getElementById("First").files[0]; 
+  let second = document.getElementById("Second").files[0]; 
+  let obj_to_be_sent = {}
+  obj_to_be_sent.processing = true;
+  console.log(first);
+  readFile(first)
+  .then( frist_as_text => {
+    obj_to_be_sent.first = frist_as_text;
+    return readFile(second);
+  })
+  .then( second_as_text => {
+    obj_to_be_sent.second = second_as_text;
+    console.log(obj_to_be_sent);
+    ws.send(JSON.stringify(obj_to_be_sent));
+    document.getElementById("Submit").disabled = true;
+  })
+  .catch(err => {
+    alert(err)
+  })
 }
