@@ -31,11 +31,13 @@ async function FaceRec(firstSource, secondSource){
   const secondImg = canvas.createCanvas(secondWidth, secondHeight);
   const secondCtx = secondImg.getContext('2d');
   secondCtx.drawImage(secondImage, 0, 0, secondWidth, secondHeight);    
-  
+
   //Trova la faccia più riconoscibile nell'immagine e ne trova il descrittore completo
   const firstFullDescr = await faceapi.detectSingleFace(firstImg).withFaceLandmarks().withFaceDescriptor();
   const secondFullDescr = await faceapi.detectSingleFace(secondImg).withFaceLandmarks().withFaceDescriptor();
-  
+
+  if(firstFullDescr === undefined || secondFullDescr === undefined) return "NoFace";
+   
   //Estrae il descrittore (array di 128 float32) dal descrittore completo
   const firstDescr = firstFullDescr.descriptor;
   const secondDescr = secondFullDescr.descriptor;

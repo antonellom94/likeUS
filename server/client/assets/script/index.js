@@ -8,8 +8,10 @@ function start_ws() {
     let mex = JSON.parse(event.data);
     if(mex.processed !== undefined && mex.processed === true && mex.result !== undefined){
       document.getElementById("Submit").disabled = false;
-      if(mex.result === "There are no recognizable faces")
-        alert(mex.result)
+      if(mex.result === "There are no recognizable faces"){
+        document.getElementById('finalimage').innerHTML = '';
+        alert(mex.result);
+      }
       else{
         let source = "data:image/jpeg;base64,"+btoa(mex.result);
         document.getElementById('finalimage').innerHTML = '<img src='+source+' height=200px> </br><a href="/">Share your result!</a>';
