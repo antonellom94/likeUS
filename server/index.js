@@ -15,7 +15,6 @@ var formidable = require("formidable");
 
 require("./passport/passport");
 const app = express();
-var FACERECWSCOMUNICATION = null;
 
 app.use(cookieParser())
 
@@ -161,6 +160,10 @@ app.get('/get_img', (req, res)=>{
 
 /* --------------------- FACEBOOK API ENDS ----------------- */
 
+/*---------------------- BRIDGE WS AMQP ------------------- */
+const EventEmitter = require('events');
+const bridge = new EventEmitter();
+
 /*--------------------- WEBSOCKET -------------------------*/
 
 // Colors for multicolor button
@@ -174,23 +177,17 @@ wss.on("connection", (ws) => {
   ws.send(JSON.stringify({message: 'scrivi /help per ottenere info'}))
   ws.on("message", (data) => {
     let mex = JSON.parse(data);
-    // Check if it is faceRec
-    if(mex.auth !== undefined && mex.auth === "FaceRec"){
-      FACERECWSCOMUNICATION = ws;
-      console.log("FaceRec online");
-    }
     // Incoming messages for processing images
-    else if(mex.processing !== undefined && mex.processing === true && mex.first !== undefined && mex.second !== undefined && FACERECWSCOMUNICATION !== null){
-      mex.corrID = ws.id;
-      // Forward this type of message to FaceRec
-      FACERECWSCOMUNICATION.send(JSON.stringify(mex));
-    }
-    // FaceRec response of processed image
-    else if(mex.processed !== undefined && mex.processed === true && mex.result !== undefined && mex.corrID !== undefined){
-      // Forword only to client who asker for it using corrID
-      wss.clients.forEach((web_sock) => {
-        if (web_sock.id === mex.corrID) web_sock.send(data);
-      });
+    if(mex.processing !== undefined && mex.processing === true && mex.first !== undefined && mex.second !== undefined){
+      console.log("recieved request");
+      rabbitMQ_channel.sendToQueue('rpc_queue', Buffer.from(data), {replyTo: response_queue , correlationId: ws.id});
+      console.log("forwarded requesto to broker")
+      // Backward response to client
+      bridge.once(ws.id, msg => {
+          console.log("emitted callback");
+          ws.send(msg);
+          console.log("response backwarded to client")
+      })
     }
     else{
       if (mex.ok === true) {
@@ -221,6 +218,45 @@ wss.on("connection", (ws) => {
       }
     }
   });
+  ws.on('error', () => {
+    console.log("A client disconnected before recieving response");
+  });
+});
+
+/*------------------------ AMQP -------------------------*/
+
+var amqp = require('amqplib/callback_api');
+var response_queue = null;
+var rabbitMQ_channel = null;
+// Set up connection with rabbitMQ broker
+amqp.connect('amqp://rabbitmq', function(error0, connection) {
+  if (error0) {
+    throw error0;
+  }
+  connection.createChannel(function(error1, channel) {
+    if (error1) {
+      throw error1;
+    }
+    else {
+      rabbitMQ_channel = channel;
+    }
+    channel.assertQueue('', {
+      exclusive: true
+    }, function(error2, q) {
+      if (error2) {
+        throw error2;
+      }
+      else{
+        response_queue = q.queue;
+      }
+      channel.consume(q.queue, msg => {
+        // trigger function set before in order to backward to client
+        console.log("recieved response, emitting callbacks...")
+        bridge.emit(msg.properties.correlationId, msg.content.toString());
+      })
+    });
+  });
+  console.log("Connected to broker");
 });
 
 /*------------------------FACEREC------------------------*/

@@ -2,7 +2,7 @@ const faceapi = require('face-api.js');
 const canvas = require('canvas');
 const sizeOf = require('image-size');
 const fs = require('fs');
-const ws = require('ws');
+const amqp = require('amqplib/callback_api');
 
 const { Canvas, Image, ImageData } = canvas;
 faceapi.env.monkeyPatch({ Canvas, Image, ImageData });
@@ -64,34 +64,47 @@ async function FaceRec(firstSource, secondSource){
   return buffer.toString('binary');
 }
 
-// Web socket connesso all'application server
-const web_sock = new ws("ws://appserver:3000/")
-web_sock.on("open", () => {
-    web_sock.send(JSON.stringify({auth: "FaceRec"}));
-    console.log("Connected to application server");
-})
-web_sock.on("message", data => {
-  let mex = JSON.parse(data);
-  // process data ...
-  if(mex.first !== undefined && mex.second !== undefined && mex.corrID !== undefined){
-    let firstPath = "./"+mex.corrID+"first.jpg";
-    let secondPath = "./"+mex.corrID+"second.jpg";
-    fs.writeFileSync(firstPath, mex.first, 'binary');
-    fs.writeFileSync(secondPath, mex.second, 'binary');
-    FaceRec(firstPath, secondPath)
-    .then(resp => {
-      fs.unlinkSync(firstPath);
-      fs.unlinkSync(secondPath);
-      if(resp === "NoFace")
-        web_sock.send(JSON.stringify({processed: true, result: "There are no recognizable faces", corrID: mex.corrID}));
-      else
-        web_sock.send(JSON.stringify({processed: true, result: resp, corrID: mex.corrID}));
-    });
-    
+// Connection to broker
+
+amqp.connect('amqp://rabbitmq', function(error0, connection) {
+  if (error0) {
+    throw error0;
   }
-})
-web_sock.on("error", err => {
-  console.log("il server si è disconnesso");
-})
+  connection.createChannel(function(error1, channel) {
+    if (error1) {
+      throw error1;
+    }
+    var queue = 'rpc_queue';
+    channel.assertQueue(queue, {
+      durable: false
+    });
+    channel.prefetch(1);
+    channel.consume(queue, function reply(msg) {
+      console.log("recieved message");
+      var mex = JSON.parse(msg.content.toString());
+      // process data ...
+      let firstPath = "./"+msg.properties.correlationId+"first.jpg";
+      let secondPath = "./"+msg.properties.correlationId+"second.jpg";
+      fs.writeFileSync(firstPath, mex.first, 'binary');
+      fs.writeFileSync(secondPath, mex.second, 'binary');
+      FaceRec(firstPath, secondPath)
+      .then(resp => {
+        fs.unlinkSync(firstPath);
+        fs.unlinkSync(secondPath);
+        if(resp === "NoFace")
+          channel.sendToQueue(msg.properties.replyTo, Buffer.from(JSON.stringify({processed: true, result: "There are no recognizable faces"})), {correlationId: msg.properties.correlationId});
+        else
+          channel.sendToQueue(msg.properties.replyTo, Buffer.from(JSON.stringify({processed: true, result: resp})), {correlationId: msg.properties.correlationId});
+        
+        channel.ack(msg);
+      })
+      .catch(err => {
+        channel.sendToQueue(msg.properties.replyTo, Buffer.from(JSON.stringify({processed: true, result: mex.first})), {correlationId: msg.properties.correlationId});
+      })
+    });
+    console.log("Succesfully connected to broker... Ready for processing");
+  });
+});
+
 
 module.exports = { FaceRec };

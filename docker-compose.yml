@@ -5,21 +5,16 @@ services:
             context: ./server
         ports:
             - "3000:3000"
+        depends_on: 
+            - "facerec"
+            - "rabbitmq"
         container_name: AppServer
     facerec:
         build:
             context: ./FaceRec
-        ports: 
-            - "3001:3001"
         depends_on: 
-            - "appserver"
+            - "rabbitmq"
         container_name: FaceRec
-    nginx:
-        restart: always
-        build:
-            context: ./nginx
-        ports:
-            - "80:80"
-        depends_on: 
-            - "appserver"
-        container_name: Nginx
+    rabbitmq:
+        image: rabbitmq:3
+        container_name: RabbitMQ
