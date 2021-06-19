@@ -10,7 +10,8 @@ RUN apt-get update && \
     python3 \
     make \
     gcc \ 
-    libc6-dev
+    libc6-dev \
+    -y fontconfig-config
 
 RUN npm install
 

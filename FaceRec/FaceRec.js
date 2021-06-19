@@ -54,17 +54,14 @@ async function FaceRec(firstSource, secondSource){
   //Nel font va indicata la grandezza, per questo concateno la grandezza voluta con px nomefont
   const mySize = firstHeight/5;
   const myFont = "px Georgia";
+  
   finalCtx.font = mySize + myFont;
   finalCtx.fillStyle = "white";
   finalCtx.textAlign = "center";
+
   finalCtx.fillText(dist + "%", firstWidth, firstHeight * 9/10);
   const buffer = finalImg.toBuffer('image/png');
   return buffer.toString('binary');
-
-/*
-console.log("finito");
-  const buffer = firstImg.toBuffer('image/png');
-  return buffer.toString('binary');*/
 }
 
 // Web socket connesso all'application server
