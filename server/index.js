@@ -229,35 +229,64 @@ var amqp = require('amqplib/callback_api');
 var response_queue = null;
 var rabbitMQ_channel = null;
 // Set up connection with rabbitMQ broker
-amqp.connect('amqp://rabbitmq', function(error0, connection) {
-  if (error0) {
-    throw error0;
-  }
-  connection.createChannel(function(error1, channel) {
-    if (error1) {
-      throw error1;
-    }
-    else {
-      rabbitMQ_channel = channel;
-    }
-    channel.assertQueue('', {
-      exclusive: true
-    }, function(error2, q) {
-      if (error2) {
-        throw error2;
+var connectToBroker = async() => {
+  return new Promise((resolve, reject) => {
+    // connection setup client side
+    amqp.connect('amqp://rabbitmq', function(error0, connection) {
+      if (error0) {
+        reject(error0);
+        return;
       }
-      else{
-        response_queue = q.queue;
-      }
-      channel.consume(q.queue, msg => {
-        // trigger function set before in order to backward to client
-        console.log("recieved response, emitting callbacks...")
-        bridge.emit(msg.properties.correlationId, msg.content.toString());
-      })
+      connection.createChannel(function(error1, channel) {
+        if (error1) {
+          throw error1;
+        }
+        else {
+          rabbitMQ_channel = channel;
+        }
+        channel.assertQueue('', {
+          exclusive: true
+        }, function(error2, q) {
+          if (error2) {
+            throw error2;
+          }
+          else{
+            response_queue = q.queue;
+          }
+          channel.consume(q.queue, msg => {
+            // trigger function set before in order to backward to client
+            console.log("recieved response, emitting callbacks...")
+            bridge.emit(msg.properties.correlationId, msg.content.toString());
+          })
+        });
+      });
+      resolve();
     });
   });
-  console.log("Connected to broker");
-});
+}
+
+// wait for the broker which is starting up
+
+var pollConnectionAtStartUp = async () =>{
+  while(true){
+    try{
+      await connectToBroker();
+      console.log("Connected to broker");
+      break;
+    }
+    catch(err){
+      await async function(){
+        return new Promise((resolve, reject)=>{
+          setTimeout(()=>{
+            resolve();
+          }, 8000);
+        });
+      }
+    } 
+  }
+}
+
+pollConnectionAtStartUp();
 
 /*------------------------FACEREC------------------------*/
 
@@ -320,4 +349,13 @@ app.post("/FaceRec", function (req, res) {
 
 server.listen(3000, () => {
   console.log("server reachable at port 3000");
+});
+
+// enable graceful stop
+
+process.on('SIGTERM', () => {
+  console.info('SIGTERM signal received.');
+  wss.close();
+  server.close();
+  process.exit(0);
 });

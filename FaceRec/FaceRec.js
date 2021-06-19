@@ -67,46 +67,79 @@ async function FaceRec(firstSource, secondSource){
 }
 
 // Connection to broker
-
-amqp.connect('amqp://rabbitmq', function(error0, connection) {
-  if (error0) {
-    throw error0;
-  }
-  connection.createChannel(function(error1, channel) {
-    if (error1) {
-      throw error1;
-    }
-    var queue = 'rpc_queue';
-    channel.assertQueue(queue, {
-      durable: false
-    });
-    channel.prefetch(1);
-    channel.consume(queue, function reply(msg) {
-      console.log("recieved message");
-      var mex = JSON.parse(msg.content.toString());
-      // process data ...
-      let firstPath = "./"+msg.properties.correlationId+"first.jpg";
-      let secondPath = "./"+msg.properties.correlationId+"second.jpg";
-      fs.writeFileSync(firstPath, mex.first, 'binary');
-      fs.writeFileSync(secondPath, mex.second, 'binary');
-      FaceRec(firstPath, secondPath)
-      .then(resp => {
-        fs.unlinkSync(firstPath);
-        fs.unlinkSync(secondPath);
-        if(resp === "NoFace")
-          channel.sendToQueue(msg.properties.replyTo, Buffer.from(JSON.stringify({processed: true, result: "There are no recognizable faces"})), {correlationId: msg.properties.correlationId});
-        else
-          channel.sendToQueue(msg.properties.replyTo, Buffer.from(JSON.stringify({processed: true, result: resp})), {correlationId: msg.properties.correlationId});
-        
-        channel.ack(msg);
-      })
-      .catch(err => {
-        channel.sendToQueue(msg.properties.replyTo, Buffer.from(JSON.stringify({processed: true, result: mex.first})), {correlationId: msg.properties.correlationId});
-      })
-    });
-    console.log("Succesfully connected to broker... Ready for processing");
+var connectToBroker = async() => {
+  return new Promise((resolve, reject) => {
+    // Connection setup server side
+    amqp.connect('amqp://rabbitmq', async function(error0, connection) {
+      if (error0) {
+        reject(error0);
+        return;
+      }
+      connection.createChannel(function(error1, channel) {
+        if (error1) {
+          throw error1;
+        }
+        var queue = 'rpc_queue';
+        channel.assertQueue(queue, {
+          durable: false
+        });
+        channel.prefetch(1);
+        channel.consume(queue, function reply(msg) {
+          console.log("recieved message");
+          var mex = JSON.parse(msg.content.toString());
+          // process data ...
+          let firstPath = "./"+msg.properties.correlationId+"first.jpg";
+          let secondPath = "./"+msg.properties.correlationId+"second.jpg";
+          fs.writeFileSync(firstPath, mex.first, 'binary');
+          fs.writeFileSync(secondPath, mex.second, 'binary');
+          FaceRec(firstPath, secondPath)
+          .then(resp => {
+            fs.unlinkSync(firstPath);
+            fs.unlinkSync(secondPath);
+            if(resp === "NoFace")
+              channel.sendToQueue(msg.properties.replyTo, Buffer.from(JSON.stringify({processed: true, result: "There are no recognizable faces"})), {correlationId: msg.properties.correlationId});
+            else
+              channel.sendToQueue(msg.properties.replyTo, Buffer.from(JSON.stringify({processed: true, result: resp})), {correlationId: msg.properties.correlationId});
+            
+            channel.ack(msg);
+          })
+          .catch(err => {
+            channel.sendToQueue(msg.properties.replyTo, Buffer.from(JSON.stringify({processed: true, result: mex.first})), {correlationId: msg.properties.correlationId});
+          })
+        });
+        console.log("Succesfully connected to broker... Ready for processing");
+        resolve();
+      });
+    }); 
   });
+}
+
+// wait for the broker which is starting up
+
+var pollConnectionAtStartUp = async () =>{
+  while(true){
+    try{
+      await connectToBroker();
+      console.log("Connected to broker");
+      break;
+    }
+    catch(err){
+      await async function(){
+        return new Promise((resolve, reject)=>{
+          setTimeout(()=>{
+            resolve();
+          }, 8000);
+        });
+      }
+    }
+  }
+}
+
+pollConnectionAtStartUp();
+
+// enable graceful stop
+
+process.on('SIGTERM', () => {
+  process.exit(0);
 });
 
-
-module.exports = { FaceRec };
