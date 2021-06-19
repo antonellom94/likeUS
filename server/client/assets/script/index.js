@@ -12,7 +12,7 @@ function start_ws() {
         alert(mex.result)
       else{
         let source = "data:image/jpeg;base64,"+btoa(mex.result);
-        document.getElementById('finalimage').innerHTML = '<img src='+source+' width=200px> <a href="/">Condividi</a>';
+        document.getElementById('finalimage').innerHTML = '<img src='+source+' height=200px> </br><a href="/">Share your result!</a>';
       }
     }
     else{
@@ -52,8 +52,6 @@ function send_message(event) {
       text +
       "</div></div>";
     ws.send(JSON.stringify({ message: text }));
-
-    document.getElementById("gears").style.display = "inline";
   }
 }
 function clear_chat() {
@@ -72,6 +70,11 @@ async function readFile(path){
   })
 }
 function sendImages(){
+  document.getElementById('finalimage').innerHTML = '<div class="gears">'+
+                                                    '<img src="./assets/images/First.jpg" alt="gear" class="big">'+
+                                                    '</br>We are processing your result!'+
+                                                    '</br>In the meantime, you can use our chat!'+
+                                                    '</div>';
   let first = document.getElementById("First").files[0]; 
   let second = document.getElementById("Second").files[0]; 
   let obj_to_be_sent = {}
@@ -90,5 +93,6 @@ function sendImages(){
   })
   .catch(err => {
     alert(err)
+    document.getElementById('finalimage').innerHTML = '';
   })
 }
