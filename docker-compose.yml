@@ -5,6 +5,7 @@ services:
             context: ./server
         ports:
             - "3000:3000"
+        container_name: AppServer
     facerec:
         build:
             context: ./FaceRec
@@ -12,6 +13,7 @@ services:
             - "3001:3001"
         depends_on: 
             - "appserver"
+        container_name: FaceRec
     nginx:
         restart: always
         build:
@@ -20,3 +22,4 @@ services:
             - "80:80"
         depends_on: 
             - "appserver"
+        container_name: Nginx

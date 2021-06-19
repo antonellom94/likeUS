@@ -68,7 +68,7 @@ console.log("finito");
 }
 
 // Web socket connesso all'application server
-const web_sock = new ws("ws://localhost:3000/")
+const web_sock = new ws("ws://appserver:3000/")
 web_sock.on("open", () => {
     web_sock.send(JSON.stringify({auth: "FaceRec"}));
     console.log("Connected to application server");
