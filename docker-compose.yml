@@ -10,14 +10,12 @@ services:
             - "facerec"
             - "rabbitmq"
         container_name: AppServer
-
     facerec:
         build:
             context: ./FaceRec
         depends_on: 
             - "rabbitmq"
         container_name: FaceRec
-
     rabbitmq:
         image: rabbitmq:3
         container_name: RabbitMQ

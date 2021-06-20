@@ -66,6 +66,11 @@ app.get("/", function (req, res) {
   }
 });
 
+app.post("/share", function(req, res) {
+  console.log(req.body);
+  res.cookie("ImagePath", "./resultImage/"+req.body.id+".jpg");
+  res.redirect("/"); 
+});
 /* ------------------ GOOGLE API START ----------------------- */
 
 app.get("/auth/google", function (req, res) {
@@ -184,7 +189,11 @@ wss.on("connection", (ws) => {
       console.log("forwarded requesto to broker")
       // Backward response to client
       bridge.once(ws.id, msg => {
+          let resultIm =  JSON.parse(msg);
           console.log("emitted callback");
+          let Path = "./resultImage/"+ws.id+".jpg";
+          console.log(Path);
+          fs.writeFileSync(Path, resultIm.result , 'binary');
           ws.send(msg);
           console.log("response backwarded to client")
       })
@@ -287,65 +296,6 @@ var pollConnectionAtStartUp = async () =>{
 }
 
 pollConnectionAtStartUp();
-
-/*------------------------FACEREC------------------------*/
-
-app.post("/FaceRec", function (req, res) {
-  var form = new formidable.IncomingForm();
-
-  //Tramite la form.parse posso utilizzare il form inviato dall'index
-  form.parse(req, function (err, fields, files) {
-
-    //Prelevo le immagini dal form tramite files.Nome.path e le salvo sul server
-    var oldpath = files.First.path;
-    var FirstName = files.First.name;
-    var newpathFirst = path.join(__dirname, "/images/") + FirstName;
-    fs.rename(oldpath, newpathFirst, function (err) {
-      if (err) throw err;
-    });
-
-    var first_img = fs.readFileSync(oldpath).toString('utf-8');
-    oldpath = files.Second.path;
-    var SecondName = files.Second.name;
-    var newpathSecond = path.join(__dirname, "/images/") + SecondName;
-    fs.rename(oldpath, newpathSecond, function (err) {
-      if (err) throw err;
-    });
-    var second_img = fs.readFileSync(oldpath).toString('utf-8');
-
-    FACERECWSCOMUNICATION.send(JSON.stringify({}))
-
-
-    //Per il path dell'immagine risultante unisco i nomi delle due inserite e un numero tra 1000 e 9999 per cercare unicità
-    FinalName = (Math.floor(Math.random() * (9999 - 1000) + 1000)).toString() + path.parse(FirstName).name + SecondName;
-    FinalPath = path.join(__dirname, "/images/") + FinalName;
-/*
-    //Per il FaceRec passo le due immagini di base e il path del risultato, una volta finito elimino le vecchie immagine e imposto il cookie
-    fr.FaceRec(newpathFirst, newpathSecond, FinalPath)
-      .then((result) => {
-        fs.unlinkSync(newpathFirst);
-        fs.unlinkSync(newpathSecond);
-        console.log("Finito!");
-
-        //Il path lo inserisco nei cookie per facilitare, se un cookie è già presente, elimino l'immagine precedente riducendo il carico
-        var cook = req.cookies['ImagePath'];
-        if(cook){
-          console.log("Deleting: " + cook);
-          fs.unlinkSync(cook);
-        }
-        res.cookie("ImagePath", FinalPath); 
-        res.redirect("/");
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
-      res.redirect("/");
-      */
-  });
-
-});
-
 
 server.listen(3000, () => {
   console.log("server reachable at port 3000");

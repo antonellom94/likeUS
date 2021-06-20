@@ -1,5 +1,7 @@
 var counter, ws;
 var go_vitaletti_go = true;
+var resultImage = null;
+
 function start_ws() {
   counter = 0;
   ws = new WebSocket("ws://localhost:3000/");
@@ -13,8 +15,10 @@ function start_ws() {
         alert(mex.result);
       }
       else{
-        let source = "data:image/jpeg;base64,"+btoa(mex.result);
-        document.getElementById('finalimage').innerHTML = '<img src='+source+' height=200px> </br><a href="/">Share your result!</a>';
+        resultImage = btoa(mex.result);
+        let source = "data:image/jpeg;base64,"+resultImage;
+        document.getElementById('finalimage').innerHTML = '<img src='+source+' height=200px> </br>' +
+                                                          '<form action="/share" method="POST"> <input type="hidden" id="id" name="id" value="'+mex.id+'"><input type="submit" value="Share your result!"></form>';
       }
     }
     else{
@@ -97,4 +101,21 @@ function sendImages(){
     alert(err)
     document.getElementById('finalimage').innerHTML = '';
   })
+}
+
+function sendresult(){
+  fetch('/share', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(resultImage),
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log('Success:', data);
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+  });
 }

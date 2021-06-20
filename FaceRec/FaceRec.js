@@ -97,14 +97,14 @@ var connectToBroker = async() => {
             fs.unlinkSync(firstPath);
             fs.unlinkSync(secondPath);
             if(resp === "NoFace")
-              channel.sendToQueue(msg.properties.replyTo, Buffer.from(JSON.stringify({processed: true, result: "There are no recognizable faces"})), {correlationId: msg.properties.correlationId});
+              channel.sendToQueue(msg.properties.replyTo, Buffer.from(JSON.stringify({processed: true, result: "There are no recognizable faces", id: msg.properties.correlationId})), {correlationId: msg.properties.correlationId});
             else
-              channel.sendToQueue(msg.properties.replyTo, Buffer.from(JSON.stringify({processed: true, result: resp})), {correlationId: msg.properties.correlationId});
+              channel.sendToQueue(msg.properties.replyTo, Buffer.from(JSON.stringify({processed: true, result: resp, id: msg.properties.correlationId})), {correlationId: msg.properties.correlationId});
             
             channel.ack(msg);
           })
           .catch(err => {
-            channel.sendToQueue(msg.properties.replyTo, Buffer.from(JSON.stringify({processed: true, result: mex.first})), {correlationId: msg.properties.correlationId});
+            channel.sendToQueue(msg.properties.replyTo, Buffer.from(JSON.stringify({processed: true, result: mex.first, id: msg.properties.correlationId})), {correlationId: msg.properties.correlationId});
           })
         });
         console.log("Succesfully connected to broker... Ready for processing");
