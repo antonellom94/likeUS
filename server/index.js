@@ -45,10 +45,10 @@ app.get("/", function (req, res) {
   console.log(req.session.cookie);
 
   //Controllo se in questa sessione sia stato eseguito almeno una volta il FaceRec
-  if(cookies.ImagePath){
-    if(fs.existsSync(cookies.ImagePath))
-      var googleButton =
-        "<br>Press this to upload your image to <button onclick='window.location.href=\"/auth/google\"'>Drive</button>";
+  if(cookies.ImagePath && fs.existsSync(cookies.ImagePath)){
+
+    var googleButton =
+      "<br>Press this to upload your image to <button onclick='window.location.href=\"/auth/google\"'>Drive</button>";
 
     //Controllo se è già presente un token di google, in caso controllo la scadenza
     if (cookies.googleToken)
@@ -59,7 +59,7 @@ app.get("/", function (req, res) {
           "<br>Try your upload on <button onclick='window.location.href=\"/upload\"'>Drive</button>";
 
     var twitterButton =
-      "<button onclick='window.location.href=\"/auth/twitter\"'>Login</button>";
+      "<br>You can share also to <button onclick='window.location.href=\"/auth/twitter\"'>Twitter</button>";
     res.send("This is the Homepage" + googleButton + twitterButton);
   } else {
     res.send("Nothing to do here, but you can go <button onclick='window.location.href=\"/home\"'>here</button>");
@@ -309,3 +309,24 @@ process.on('SIGTERM', () => {
   server.close();
   process.exit(0);
 });
+
+/****************SERVER CLEANING***************/
+
+function CleanServer(cleanDir, timeToExpire){
+  console.log("Cleaning the " + cleanDir + " directory...");
+  fs.readdir(cleanDir, function(err, files) {
+    files.forEach(function(file, index) {
+      console.log(file);
+      fs.stat(path.join(cleanDir, file), function(err, stat) {
+        if((stat.mtimeMs + timeToExpire) < Date.now()){
+          console.log("Deleting: "+ file);
+          fs.unlinkSync(path.join(cleanDir, file));
+        }
+          
+      });
+    });
+  });  
+}
+
+//Ogni 10 minuti elimina i file presenti in ./resultImage modificati da più di un'ora
+setInterval(CleanServer, 1000 * 60 * 10, './resultImage', 1000 * 60 * 60);
