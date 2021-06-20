@@ -1,5 +1,6 @@
 version: "3.8"
 services:
+
     appserver:
         build:
             context: ./server
@@ -9,12 +10,26 @@ services:
             - "facerec"
             - "rabbitmq"
         container_name: AppServer
+
     facerec:
         build:
             context: ./FaceRec
         depends_on: 
             - "rabbitmq"
         container_name: FaceRec
+
     rabbitmq:
         image: rabbitmq:3
         container_name: RabbitMQ
+
+    nginx:
+        restart: always
+        build:
+            context: ./nginx
+        ports:
+            - "80:80"
+        depends_on: 
+            - "appserver"
+            - "facerec"
+            - "rabbitmq"
+        container_name: Nginx
