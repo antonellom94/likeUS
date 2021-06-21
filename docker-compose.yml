@@ -2,6 +2,7 @@ version: "3.8"
 services:
 
     appserver:
+        restart: always
         build:
             context: ./server
         ports:
@@ -10,7 +11,9 @@ services:
             - "facerec"
             - "rabbitmq"
         container_name: AppServer
+        
     facerec:
+        restart: always
         build:
             context: ./FaceRec
         depends_on: 

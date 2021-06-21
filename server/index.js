@@ -18,9 +18,6 @@ const app = express();
 
 app.use(cookieParser());
 
-// Serves the page
-app.use("/home", express.static(path.join(__dirname,"client")));
-
 app.use(express.urlencoded({ extended: false }));
 
 // 
