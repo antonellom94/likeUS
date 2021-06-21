@@ -1,28 +1,33 @@
 const axios = require('axios').default
 const fs = require('fs')
 const keys = require('../config/keys')
+const uuid = require('uuid')
 
 const STATE = "OauthMiFaSchifo"
 
 const request_uri = 'https://www.facebook.com/v10.0/dialog/oauth?client_id='+
-keys.APP_ID+'&redirect_uri=http://localhost:3000/get_img&state='+
+keys.APP_ID+'&redirect_uri=http://localhost/get_img&state='+
 STATE+"&scope=user_photos,user_posts"
 
 
-const download_image = (url, image_path) =>
-  axios({
-    url,
-    responseType: 'stream',
-  }).then(
-    response =>
-      new Promise((resolve, reject) => {
-        response.data
-          .pipe(fs.createWriteStream(image_path))
-          .on('finish', () => resolve())
-          .on('error', e => reject(e));
-      }),
-  );
-
+const download_image = (url, image_path) => {
+  return new Promise( (ok_download, rej) => {
+    axios({
+      url,
+      responseType: 'stream',
+    })
+    .then( response => {
+        return new Promise((resolve, reject) => {
+          response.data
+            .pipe(fs.createWriteStream(image_path))
+            .on('finish', () => resolve(image_path))
+            .on('error', e => reject(e));
+        });
+    })
+    .then(image_path => ok_download(image_path))
+    .catch(err => rej(err));
+  });
+}
 
 module.exports.get_profile_picture = function(req,res){
     if(req.query.state === STATE){ // STATE è un parametro di check
@@ -33,18 +38,13 @@ module.exports.get_profile_picture = function(req,res){
         .then(res_token => {
             return axios.get('https://graph.facebook.com/me/picture?height=200&width=200&redirect=0&access_token='+res_token.data.access_token) // API call to get profile image
         })
-        .then(async profile_picture_res => {
-            /*
-            let buf = Buffer.from(profile_picture_res.data, 'utf-8')
-            fs.writeFile('./prof.jpg', buf , ()=>{
-                res.send("Immagine prelevata")
-            })
-           console.log(Buffer.from(profile_picture_res.data, 'binary'))
-           */
-          console.log(profile_picture_res.data.data.url)
-            let example_image_1 = await download_image(profile_picture_res.data.data.url, 'example-1.jpg');
+        .then(profile_picture_res => {
+          return download_image(profile_picture_res.data.data.url, './facebookImage/'+uuid.v4()+'.jpg' ); // image wil be saved in facebookImage folder
         })
-        .catch(err => {console.log(err); res.send('Si è verificato un errore')});    // Se c'è stato un errore stanpa l'errore
+        .then( pathzesco => {
+          res.cookie("facebookPath", pathzesco).redirect("/home/logged.html");
+        })
+        .catch(err => {console.log(err); res.send('Si è verificato un errore')});    // Se c'è stato un errore stampa l'errore
     }
     else{
         res.send("Autenticazione compromessa");
@@ -52,5 +52,12 @@ module.exports.get_profile_picture = function(req,res){
 }
 
 module.exports.facebook_auth = function(req, res){
-    res.redirect(request_uri)
+  if(req.cookies.facebookPath !== undefined && fs.existsSync(req.cookies.facebookPath)){
+    console.log("Cookie già presente, ridirezionare alla pagina secondaria");
+    res.redirect("/home/logged.html");
+  }
+  else{
+    console.log("Coockie non presente, necessario accesso");
+    res.redirect(request_uri);
+  }
 }

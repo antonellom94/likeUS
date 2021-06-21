@@ -103,6 +103,44 @@ function sendImages(){
   })
 }
 
+function getCook(cookiename) {
+  // Get name followed by anything except a semicolon
+  var cookiestring=RegExp(cookiename+"=[^;]+").exec(document.cookie);
+  // Return everything after the equal sign, or an empty string if the cookie name not found
+  return decodeURIComponent(!!cookiestring ? cookiestring.toString().replace(/^[^=]+./,"") : "");
+}
+
+
+function sendImagesLogged(){
+  document.getElementById('finalimage').innerHTML = '<div class="gears">'+
+                                                    '<img src="./assets/images/First.jpg" alt="gear" class="big">'+
+                                                    '</br>We are processing your result!'+
+                                                    '</br>In the meantime, you can use our chat!'+
+                                                    '</div>';
+  let second = document.getElementById("Second").files[0]; 
+  let obj_to_be_sent = {}
+  obj_to_be_sent.processing = true;
+  let cookie_list = document.cookie.split(";");
+  let path = getCook("facebookPath");
+  if(path === null){
+    alert("Il cookie non esiste");
+    return;
+  }
+  obj_to_be_sent.logged = true;
+  obj_to_be_sent.first = path;
+  readFile(second)
+  .then( second_as_text => {
+      obj_to_be_sent.second = second_as_text;
+      console.log(obj_to_be_sent);
+      ws.send(JSON.stringify(obj_to_be_sent));
+      document.getElementById("Submit").disabled = true;
+  })
+  .catch(err => {
+    alert(err)
+    document.getElementById('finalimage').innerHTML = '';
+  })
+}
+
 function sendresult(){
   fetch('/share', {
     method: 'POST',

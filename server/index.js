@@ -16,7 +16,7 @@ var formidable = require("formidable");
 require("./passport/passport");
 const app = express();
 
-app.use(cookieParser())
+app.use(cookieParser());
 
 // Serves the page
 app.use("/home", express.static(path.join(__dirname,"client")));
@@ -159,9 +159,14 @@ app.get('/auth/facebook', (req,res)=>{
 });
 
 app.get('/get_img', (req, res)=>{
+  console.log("prelevo l'mmagine profilo");
   Facebook_auth_and_apis.get_profile_picture(req, res);
 });
 
+app.get('/f_log_out', (req,res) => {
+  res.clearCookie("facebookPath");
+  res.redirect("/home");
+});
 
 /* --------------------- FACEBOOK API ENDS ----------------- */
 
@@ -185,7 +190,18 @@ wss.on("connection", (ws) => {
     // Incoming messages for processing images
     if(mex.processing !== undefined && mex.processing === true && mex.first !== undefined && mex.second !== undefined){
       console.log("recieved request");
-      rabbitMQ_channel.sendToQueue('rpc_queue', Buffer.from(data), {replyTo: response_queue , correlationId: ws.id});
+      console.log(mex.first)
+      if(mex.logged !== undefined && mex.logged === true){
+        console.log("before:");
+        console.log(mex.first);
+        mex.first = fs.readFileSync(mex.first, "binary");
+        console.log("after");
+        console.log(mex.first)
+        rabbitMQ_channel.sendToQueue('rpc_queue', Buffer.from(JSON.stringify(mex)), {replyTo: response_queue , correlationId: ws.id});
+      }
+      else{
+        rabbitMQ_channel.sendToQueue('rpc_queue', Buffer.from(data), {replyTo: response_queue , correlationId: ws.id});
+      }
       console.log("forwarded requesto to broker")
       // Backward response to client
       bridge.once(ws.id, msg => {
