@@ -20,10 +20,6 @@ services:
             - "rabbitmq"
         container_name: FaceRec
         
-    rabbitmq:
-        image: rabbitmq:3
-        container_name: RabbitMQ
-
     facerecapi:
         restart: always
         build:
@@ -45,5 +41,6 @@ services:
         depends_on: 
             - "appserver"
             - "facerec"
+            - "facerecapi"
             - "rabbitmq"
         container_name: Nginx
