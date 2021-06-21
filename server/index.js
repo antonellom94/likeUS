@@ -20,6 +20,26 @@ app.use(cookieParser());
 
 app.use(express.urlencoded({ extended: false }));
 
+// API
+app.post("/faceRec", (req,res)=>{
+  // Request must contain a JSON body with 2 binary string representing the imges
+  mex = req.body;
+  if(req.body.first === undefined || req.body.second === undefined){
+    res.status(400).send();
+  }
+  mex.processing = true;
+  let corrID = uuid.v4();
+  rabbitMQ_channel.sendToQueue('rpcAPI_queue', Buffer.from(JSON.stringify(mex)), {replyTo: response_queue , correlationId: corrID});
+  let APIresp = msg => {
+    res.type('application/json').send(msg);
+  };
+  bridge.once(corrID, APIresp);
+  setTimeout(() =>  {
+    bridge.off(corrID, APIresp);
+    res.status(500).send();
+  }, 60000 * 5);
+});
+
 // 
 app.use(
   session({
