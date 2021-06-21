@@ -77,7 +77,7 @@ app.get("/", function (req, res) {
 
     var twitterButton =
       "<br>You can share also to <button onclick='window.location.href=\"/auth/twitter\"'>Twitter</button>";
-    res.send("This is the Homepage" + googleButton + twitterButton);
+    res.send("This is the Homepage" + googleButton + twitterButton + "<br>You can return to the homepage <button onclick='window.location.href=\"/home\"'>here</button>");
   } else {
     res.send("Nothing to do here, but you can go <button onclick='window.location.href=\"/home\"'>here</button>");
   }
@@ -111,18 +111,19 @@ app.get("/upload", function (req, res) {
   //Controllo di nuovo se il token è scaduto per evitare problemi
   else if (cookies.googleToken.expire_time < Date.now())
     res.send(
-      "Your token expired!<br>You can, return to the <button onclick='window.location.href=\"/\"'>homepage</button>" +
+      "Your token expired!<br>You can, return to the <button onclick='window.location.href=\"/\"'>sharing page</button>" +
         " or you can try to <button onclick='window.location.href=\"/auth/google\"'>login</button>"
     );
   else {
     res.send(
-      "Uploading...<br>Meanwhile, return to the <button onclick='window.location.href=\"/\"'>homepage</button>"
+      "Uploading...<br>Meanwhile, return to the <button onclick='window.location.href=\"/home\"'>homepage</button>" +
+      "Or to the <button onclick='window.location.href=\"/\"'>sharing page</button>"
     );
     var a_t = req.cookies.googleToken.token;
     var imPath = req.cookies.ImagePath;
 
     //Essendo una post non risultano i cookie, quindi li passo tramite url
-    request.post("http://localhost:3000/upload/googleDrive?a_t=" + a_t+ "&imPath=" + imPath);
+    request.post("http://localhost/upload/googleDrive?a_t=" + a_t+ "&imPath=" + imPath);
   }
 });
 

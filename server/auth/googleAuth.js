@@ -10,7 +10,7 @@ client_secret = keys.googleClientSecret;
 code = "";
 var a_t = '';
 
-red_uri = "http://localhost:3000/auth/google/callback";
+red_uri = "http://localhost/auth/google/callback";
 var scope = "https://www.googleapis.com/auth/drive.file";
 var googleToken = "https://accounts.google.com/o/oauth2/token";
 var getCode = "https://accounts.google.com/o/oauth2/auth?client_id="+client_id+"&scope="+scope+"&approval_prompt=force&response_type=code&redirect_uri="+red_uri;
@@ -21,7 +21,7 @@ function GoogleAccess(req, res){
     res.redirect(getCode);
   else{
     res.send("Uploading...<br>Meanwhile, return to the <button onclick='window.location.href=\"/\"'>homepage</button>");
-    request.post("http://localhost:3000/upload/googleDrive");
+    request.post("http://localhost/upload/googleDrive");
   }
 
 }

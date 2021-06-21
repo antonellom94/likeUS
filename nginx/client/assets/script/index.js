@@ -140,20 +140,3 @@ function sendImagesLogged(){
     document.getElementById('finalimage').innerHTML = '';
   })
 }
-
-function sendresult(){
-  fetch('/share', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(resultImage),
-  })
-  .then(response => response.json())
-  .then(data => {
-    console.log('Success:', data);
-  })
-  .catch((error) => {
-    console.error('Error:', error);
-  });
-}
