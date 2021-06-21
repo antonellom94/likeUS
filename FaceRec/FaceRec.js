@@ -90,7 +90,6 @@ var connectToBroker = async() => {
           // process data ...
           let firstPath = "./"+msg.properties.correlationId+"first.jpg";
           let secondPath = "./"+msg.properties.correlationId+"second.jpg";
-          console.log(mex.first);
           fs.writeFileSync(firstPath, mex.first, 'binary');
           fs.writeFileSync(secondPath, mex.second, 'binary');
           FaceRec(firstPath, secondPath)

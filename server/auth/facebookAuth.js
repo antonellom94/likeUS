@@ -57,7 +57,7 @@ module.exports.facebook_auth = function(req, res){
     res.redirect("/home/logged.html");
   }
   else{
-    console.log("Coockie non presente, necessario accesso");
+    console.log("Cookie non presente, necessario accesso");
     res.redirect(request_uri);
   }
 }

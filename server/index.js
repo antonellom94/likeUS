@@ -190,23 +190,18 @@ wss.on("connection", (ws) => {
     // Incoming messages for processing images
     if(mex.processing !== undefined && mex.processing === true && mex.first !== undefined && mex.second !== undefined){
       console.log("recieved request");
-      console.log(mex.first)
       if(mex.logged !== undefined && mex.logged === true){
-        console.log("before:");
-        console.log(mex.first);
         mex.first = fs.readFileSync(mex.first, "binary");
-        console.log("after");
-        console.log(mex.first)
         rabbitMQ_channel.sendToQueue('rpc_queue', Buffer.from(JSON.stringify(mex)), {replyTo: response_queue , correlationId: ws.id});
       }
       else{
         rabbitMQ_channel.sendToQueue('rpc_queue', Buffer.from(data), {replyTo: response_queue , correlationId: ws.id});
       }
-      console.log("forwarded requesto to broker")
+      console.log("forwarded request to broker")
       // Backward response to client
       bridge.once(ws.id, msg => {
+          console.log("Response recieved");
           let resultIm =  JSON.parse(msg);
-          console.log("emitted callback");
           let Path = "./resultImage/"+ws.id+".jpg";
           console.log(Path);
           fs.writeFileSync(Path, resultIm.result , 'binary');
@@ -280,7 +275,6 @@ var connectToBroker = async() => {
           }
           channel.consume(q.queue, msg => {
             // trigger function set before in order to backward to client
-            console.log("recieved response, emitting callbacks...")
             bridge.emit(msg.properties.correlationId, msg.content.toString());
           })
         });
