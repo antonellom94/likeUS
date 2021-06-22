@@ -18,6 +18,7 @@ services:
             context: ./FaceRec
             args: 
                 - QUEUE_ARG=rpc_queue
+                - ENCODING_ARG=binary
         depends_on: 
             - "rabbitmq"
         container_name: FaceRec
@@ -28,6 +29,7 @@ services:
             context: ./FaceRec
             args: 
                 - QUEUE_ARG=rpcAPI_queue
+                - ENCODING_ARG=base64
         depends_on: 
             - "rabbitmq"
         container_name: FaceRecAPI

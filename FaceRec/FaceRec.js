@@ -8,7 +8,7 @@ const { Canvas, Image, ImageData } = canvas;
 faceapi.env.monkeyPatch({ Canvas, Image, ImageData });
 const MODEL_URL = `${__dirname}/models/`;
 
-async function FaceRec(firstSource, secondSource){
+async function FaceRec(firstSource, secondSource, encoding){
 
   //Carico i modelli di faceapi utili per lo scopo
   await faceapi.nets.ssdMobilenetv1.loadFromDisk(MODEL_URL);
@@ -63,7 +63,7 @@ async function FaceRec(firstSource, secondSource){
 
   finalCtx.fillText(dist + "%", firstWidth, firstHeight * 9/10);
   const buffer = finalImg.toBuffer('image/png');
-  return buffer.toString('binary');
+  return buffer.toString(encoding);
 }
 
 // Connection to broker
@@ -80,11 +80,11 @@ var connectToBroker = async() => {
           throw error1;
         }
         var queue = process.argv[2];
-        console.log(queue);
+        var encoding = process.argv[3];
         if(queue === "rpc_queue"){
           console.log("è rpc_queue");
         }
-        if(queue == "rpcAPI_queue"){
+        if(queue === "rpcAPI_queue"){
           console.log("è rpcAPI_queue");
         }
         channel.assertQueue(queue, {
@@ -97,9 +97,9 @@ var connectToBroker = async() => {
           // process data ...
           let firstPath = "./"+msg.properties.correlationId+"first.jpg";
           let secondPath = "./"+msg.properties.correlationId+"second.jpg";
-          fs.writeFileSync(firstPath, mex.first, 'binary');
-          fs.writeFileSync(secondPath, mex.second, 'binary');
-          FaceRec(firstPath, secondPath)
+          fs.writeFileSync(firstPath, mex.first, encoding);
+          fs.writeFileSync(secondPath, mex.second, encoding);
+          FaceRec(firstPath, secondPath, encoding)
           .then(resp => {
             fs.unlinkSync(firstPath);
             fs.unlinkSync(secondPath);
@@ -111,7 +111,10 @@ var connectToBroker = async() => {
             channel.ack(msg);
           })
           .catch(err => {
-            channel.sendToQueue(msg.properties.replyTo, Buffer.from(JSON.stringify({processed: true, result: mex.first, id: msg.properties.correlationId})), {correlationId: msg.properties.correlationId});
+            fs.unlinkSync(firstPath);
+            fs.unlinkSync(secondPath);
+            channel.sendToQueue(msg.properties.replyTo, Buffer.from(JSON.stringify({processed: true, result: "There are no recognizable faces", id: msg.properties.correlationId})), {correlationId: msg.properties.correlationId});
+            channel.ack(msg);
           })
         });
         console.log("Succesfully connected to broker... Ready for processing");

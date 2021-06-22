@@ -11,7 +11,7 @@ const path = require("path");
 const fs = require("fs");
 const cookieParser = require('cookie-parser')
 const uuid = require("uuid");
-var formidable = require("formidable");
+const isbase64 = require("is-base64");
 
 require("./passport/passport");
 const app = express();
@@ -26,20 +26,26 @@ app.use(express.json({limit: "200mb"}))
 app.post("/faceRec", (req,res)=>{
   // Request must contain a JSON body with 2 binary string representing the imges
   mex = req.body;
-  if(req.body.first === undefined || req.body.second === undefined){
+  if(Object.keys(mex).length === 0 || mex.first === undefined || mex.second === undefined || !isbase64(mex.first, {paddingRequired: true}) || !isbase64(mex.second, {paddingRequired: true})){
     res.status(400).send();
   }
-  mex.processing = true;
-  let corrID = uuid.v4();
-  rabbitMQ_channel.sendToQueue('rpcAPI_queue', Buffer.from(JSON.stringify(mex)), {replyTo: response_queue , correlationId: corrID});
-  let APIresp = msg => {
-    res.type('application/json').send(msg);
-  };
-  bridge.once(corrID, APIresp);
-  setTimeout(() =>  {
-    bridge.off(corrID, APIresp);
-    res.status(500).send();
-  }, 60000 * 5);
+  else{
+    mex.processing = true;
+    let corrID = uuid.v4();
+    rabbitMQ_channel.sendToQueue('rpcAPI_queue', Buffer.from(JSON.stringify(mex)), {replyTo: response_queue , correlationId: corrID});
+    
+    let APIresp = msg => {
+      res.status(200).type('application/json').send(msg);
+    };
+
+    bridge.once(corrID, APIresp);
+    setTimeout(() =>  {
+      bridge.off(corrID, APIresp);
+      res.status(500).send();
+    }, 1000 * 60 * 5);    
+
+  }
+
 });
 
 // 
@@ -60,8 +66,6 @@ app.get("/", function (req, res) {
   var cookies = req.cookies;
   console.log(cookies);
   console.log(Date.now());
-  //console.log(cookies["express:sess"]);
-  console.log(req.session.cookie);
 
   //Controllo se in questa sessione sia stato eseguito almeno una volta il FaceRec
   if(cookies.ImagePath && fs.existsSync(cookies.ImagePath)){
@@ -119,19 +123,24 @@ app.get("/upload", function (req, res) {
   else {
     res.send(
       "Uploading...<br>Meanwhile, return to the <button onclick='window.location.href=\"/home\"'>homepage</button>" +
-      "Or to the <button onclick='window.location.href=\"/\"'>sharing page</button>"
+      " or to the <button onclick='window.location.href=\"/\"'>sharing page</button>"
     );
     var a_t = req.cookies.googleToken.token;
     var imPath = req.cookies.ImagePath;
 
-    //Essendo una post non risultano i cookie, quindi li passo tramite url
-    request.post("http://localhost/upload/googleDrive?a_t=" + a_t+ "&imPath=" + imPath);
+    request({
+      url: "http://localhost:3000/upload/googleDrive",
+      method: 'POST',
+      json: {token: a_t, ImPath: imPath}
+    }, function(error, response, body){
+      console.log(body);
+    });
+
   }
 });
 
 app.post("/upload/googleDrive", function (req, res) {
-  var imPath = req.query.imPath;
-  googleApi.GoogleDrive("YourResult", imPath, req, res);
+  googleApi.GoogleDrive("YourResult", req.body.ImPath, req.body.token);
 });
 
 app.get("/logout/google", function (req, res) {
@@ -222,9 +231,11 @@ wss.on("connection", (ws) => {
       bridge.once(ws.id, msg => {
           console.log("Response recieved");
           let resultIm =  JSON.parse(msg);
-          let Path = "./resultImage/"+ws.id+".jpg";
-          console.log(Path);
-          fs.writeFileSync(Path, resultIm.result , 'binary');
+          if(resultIm.result !== "There are no recognizable faces") {
+            let Path = "./resultImage/"+ws.id+".jpg";
+            console.log(Path);
+            fs.writeFileSync(Path, resultIm.result , 'binary');            
+          }
           ws.send(msg);
           console.log("response backwarded to client")
       })

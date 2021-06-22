@@ -2,9 +2,7 @@ const fs = require('fs');
 const request = require('request');
 
 //Tramite il token viene usata l'api per caricare l'mmagine fileName in filePath sulla directory Root dell'account di Google Drive
-function GoogleDrive(fileName, filePath, req, res){
-
-    var a_t = req.query.a_t;
+function GoogleDrive(fileName, filePath, a_t){
 
     var fileSize = fs.statSync(filePath).size;
 

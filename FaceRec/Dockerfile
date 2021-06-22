@@ -1,8 +1,10 @@
 FROM node:14-slim
 
 ARG QUEUE_ARG
+ARG ENCODING_ARG
 
 ENV QUEUE=${QUEUE_ARG}
+ENV ENCODING=${ENCODING_ARG}
 
 WORKDIR /usr/src/FaceRec
 
@@ -23,4 +25,4 @@ COPY . .
 
 EXPOSE 3001
 
-CMD node FaceRec.js ${QUEUE}
+CMD node FaceRec.js ${QUEUE} ${ENCODING}

@@ -23,6 +23,7 @@
     "formidable": "^1.2.2",
     "googleapis": "^70.0.0",
     "image-size": "^1.0.0",
+    "is-base64": "^1.1.0",
     "node-fetch": "^2.6.1",
     "npm": "^7.7.6",
     "oauth": "^0.9.15",
