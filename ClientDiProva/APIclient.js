@@ -1,5 +1,16 @@
+// launch this script with the following sintax:
+// node APIclient.js <first_image_name> <second_image_name> <result_image_name>
+// where first_image and second_image are located in ImagesToSend directory
+
+
 const http = require('http')
 const fs = require("fs")
+
+// check wheter script call is correct
+if(process.argv[2] === undefined || process.argv[3] === undefined || process.argv[4] === undefined || process.argv.length > 5 ){
+    console.log("Wrong arguments, this script must be called like this: \nnode index.js <first_image_name> <second_image_name> <result_image_name>")
+    process.exit(0);
+}
 
 function base64_encode(file) {
     // read binary data
@@ -7,11 +18,11 @@ function base64_encode(file) {
     // convert binary data to base64 encoded string
     return bitmap.toString('base64');
 }
-const firstImage = base64_encode("./imagesToSend/First.jpg");
-const secondImage = base64_encode("./imagesToSend/Second.jpg");
+const firstImage = base64_encode("./imagesToSend/"+process.argv[2]);
+const secondImage = base64_encode("./imagesToSend/"+process.argv[3]);
 
 const data = JSON.stringify({
-    first: "UHJvdmE=",
+    first: firstImage,
     second: secondImage
 })
 
@@ -40,7 +51,7 @@ const req = http.request(options, res => {
         if(jdata.result === "There are no recognizable faces")
             console.log(jdata.result);
         else
-            fs.writeFileSync("./res.jpg", jdata.result, 'base64');
+            fs.writeFileSync(process.argv[4], jdata.result, 'base64');
     });
 
 })

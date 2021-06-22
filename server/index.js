@@ -24,7 +24,7 @@ app.use(express.json({limit: "200mb"}))
 
 // API
 app.post("/faceRec", (req,res)=>{
-  // Request must contain a JSON body with 2 binary string representing the imges
+  // Request must contain a JSON body with 2 base64 encoded string representing the images
   mex = req.body;
   if(Object.keys(mex).length === 0 || mex.first === undefined || mex.second === undefined || !isbase64(mex.first, {paddingRequired: true}) || !isbase64(mex.second, {paddingRequired: true})){
     res.status(400).send();
