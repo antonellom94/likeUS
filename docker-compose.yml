@@ -16,6 +16,8 @@ services:
         restart: always
         build:
             context: ./FaceRec
+            args: 
+                - QUEUE_ARG=rpc_queue
         depends_on: 
             - "rabbitmq"
         container_name: FaceRec
@@ -23,7 +25,9 @@ services:
     facerecapi:
         restart: always
         build:
-            context: ./FaceRecAPI
+            context: ./FaceRec
+            args: 
+                - QUEUE_ARG=rpcAPI_queue
         depends_on: 
             - "rabbitmq"
         container_name: FaceRecAPI

@@ -79,7 +79,14 @@ var connectToBroker = async() => {
         if (error1) {
           throw error1;
         }
-        var queue = 'rpc_queue';
+        var queue = process.argv[2];
+        console.log(queue);
+        if(queue === "rpc_queue"){
+          console.log("è rpc_queue");
+        }
+        if(queue == "rpcAPI_queue"){
+          console.log("è rpcAPI_queue");
+        }
         channel.assertQueue(queue, {
           durable: false
         });

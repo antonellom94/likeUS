@@ -20,6 +20,8 @@ app.use(cookieParser());
 
 app.use(express.urlencoded({ extended: false }));
 
+app.use(express.json({limit: "200mb"}))
+
 // API
 app.post("/faceRec", (req,res)=>{
   // Request must contain a JSON body with 2 binary string representing the imges

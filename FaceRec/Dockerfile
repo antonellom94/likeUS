@@ -1,5 +1,9 @@
 FROM node:14-slim
 
+ARG QUEUE_ARG
+
+ENV QUEUE=${QUEUE_ARG}
+
 WORKDIR /usr/src/FaceRec
 
 COPY package*.json ./
@@ -19,4 +23,4 @@ COPY . .
 
 EXPOSE 3001
 
-CMD ["node", "FaceRec.js"]
+CMD node FaceRec.js ${QUEUE}
