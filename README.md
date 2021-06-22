@@ -1,7 +1,3 @@
-La funzione FaceRec carica le immagini da comparare in dei canvas e, tramite faceapi, estrae un descrittore del volto più definito in ogni immagine, i descrittori vengono usati per calcolare la somiglianza tramite distanza euclidea, il risultato sarà scritto su un canvas insieme alle due immagini originali.
-Utilizzando la distanza euclidea, la percentuale mostrata in output non è lineare ma esponenziale, quindi dei risultati superiori al 40% indicano una forte somiglianza tra i due volti.
-
-
 # likeUS
 
 # Scopo del progetto
@@ -10,6 +6,21 @@ Il progetto realizza un servizio di riconoscimento facciale accedibile tramite i
 
 # Architettura e tecnologie
 
+![diagramma](diagramma.png)
+
+Gli elementi architetturali rappresentati nell'immagine sono ora presentati nel dettaglio:
+
+- **Nginx**: Web server utilizzato per servire i contenuti statici, la home del sito web in particolare, e che si comporta come reverse proxy nei confronti dei client che accedono al sito tramite pagina web e API. Rappresentato mediante un container docker, espone la porta 80 sulla network dell'host.
+- **Application Server**: implementa la logica dell'applicazione:
+    - Accede tramite API REST a 3 servizi commerciali:
+        - **Facebook**: permette al web client di recuperare la sua immagine del profilo, e utilizzarla come uno dei due input per il Face Recognition.
+        - **Google**: permette al web client di caricare l'immagine risultante dal processamento con annessa percentuale di somiglianza sul proprio google drive personale.
+        - **Twitter**: permette al web client di pubblicare il risultato come twitt sul proprio profilo twitter
+    - Inoltra al broker RabbitMQ la richiesta di processamento delle immagini provenienti sia dai web client che dai client che interagiscono mediante l'API REST.
+- **RabbitMQ**: broker utilizzato per lavorare con il protocollo asincrono amqp, necessario per implementare il pattern Remote procedure call, imperativo in questo tipo di applicazione poichè il processamento delle immagini è un operazione resource intensive che impiega un certo tempo.
+- **FaceRecAPI swarm e FaceRec swarm**: sono due gruppi di server rispettivamente destinati ad esaudire le richieste dei REST client e dei web client. Nella pratica ci si aspetta una molteplicità di worker server per ogni gruppo sui quali viene fatto load balancing, nell'ambito del progetto, per motivi di praticità, a ciascuno gruppo corrisponde un solo server rappresentato come un container. Vengono utilizzati due swarm distinti per assicurare maggiore capacità di processing ai Rest client, che potrebbero desiderare un servizio più veloce rispetto ai web client.
+- **FaceRec/FaceRecAPI**: applicazione node che implementa il Face Recognition. La funzione FaceRec carica le immagini da comparare in dei canvas e, tramite faceapi, estrae un descrittore del volto più definito in ogni immagine, i descrittori vengono usati per calcolare la somiglianza tramite distanza euclidea, il risultato sarà scritto su un canvas insieme alle due immagini originali.
+Utilizzando la distanza euclidea, la percentuale mostrata in output non è lineare ma esponenziale, quindi dei risultati superiori al 40% indicano una forte somiglianza tra i due volti.
 
 # Istruzioni per l'installazione
 
