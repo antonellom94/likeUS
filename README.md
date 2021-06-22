@@ -1,3 +1,7 @@
+La funzione FaceRec carica le immagini da comparare in dei canvas e, tramite faceapi, estrae un descrittore del volto più definito in ogni immagine, i descrittori vengono usati per calcolare la somiglianza tramite distanza euclidea, il risultato sarà scritto su un canvas insieme alle due immagini originali.
+Utilizzando la distanza euclidea, la percentuale mostrata in output non è lineare ma esponenziale, quindi dei risultati superiori al 40% indicano una forte somiglianza tra i due volti.
+
+
 # likeUS
 
 # Scopo del progetto
