@@ -371,3 +371,4 @@ function CleanServer(cleanDir, timeToExpire){
 
 //Ogni 10 minuti elimina i file presenti in ./resultImage modificati da più di un'ora
 setInterval(CleanServer, 1000 * 60 * 10, './resultImage', 1000 * 60 * 60);
+setInterval(CleanServer, 1000 * 60 * 10, './facebookImage', 1000 * 60 * 60);
