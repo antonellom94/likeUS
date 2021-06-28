@@ -127,7 +127,7 @@ app.get("/", function (req, res) {
       "This is the Homepage" +
         googleButton +
         twitterButton +
-        "<br>You can return to the homepage <button onclick='window.location.href=\"/home\"'>here</button>"
+        "<br>You can return to the homepage <button onclick='window.location.href=\"/home/\"'>here</button>"
     );
   } else {
     res.send(
@@ -160,7 +160,7 @@ app.get("/upload", function (req, res) {
   if (!fs.existsSync(cookies.ImagePath)) {
     res.clearCookie("ImagePath");
     res.send(
-      "Your file expired! <br>Come back to <button onclick='window.location.href=\"/home\"'>here</button>"
+      "Your file expired! <br>Come back to <button onclick='window.location.href=\"/home/\"'>here</button>"
     );
   }
   //Controllo di nuovo se il token è scaduto per evitare problemi
@@ -171,7 +171,8 @@ app.get("/upload", function (req, res) {
     );
   else {
     res.send(
-      "Uploading...<br>Meanwhile, return to the <button onclick='window.location.href=\"/home\"'>homepage</button>" +
+      "Uploading...<br>Meanwhile, return to the <button onclick='window.location.href=\"/home/
+      \"'>homepage</button>" +
         " or to the <button onclick='window.location.href=\"/\"'>sharing page</button>"
     );
     var a_t = req.cookies.googleToken.token;
