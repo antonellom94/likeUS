@@ -330,7 +330,6 @@ wss.on("connection", (ws) => {
 /*------------------------ AMQP -------------------------*/
 
 var amqp = require("amqplib/callback_api");
-const { runInNewContext } = require("vm");
 var response_queue = null;
 var rabbitMQ_channel = null;
 // Set up connection with rabbitMQ broker

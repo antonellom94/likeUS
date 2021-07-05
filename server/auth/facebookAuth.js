@@ -3,7 +3,7 @@ const fs = require('fs')
 const keys = require('../config/keys')
 const uuid = require('uuid')
 
-const STATE = "OauthMiFaSchifo"
+const STATE = "Gino"
 
 const request_uri = 'https://www.facebook.com/v10.0/dialog/oauth?client_id='+
 keys.APP_ID+'&redirect_uri=http://localhost/get_img&state='+
