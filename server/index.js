@@ -12,7 +12,8 @@ const fs = require("fs");
 const cookieParser = require("cookie-parser");
 const uuid = require("uuid");
 const isbase64 = require("is-base64");
-const Twitter = require("twitter");
+
+/*const Twitter = require("twitter");
 
 // spostare logica e richiamare solamente nell'index
 const client = new Twitter({
@@ -46,7 +47,7 @@ client.post(
     }
   }
 );
-
+*/
 require("./passport/passport");
 const app = express();
 
@@ -120,13 +121,12 @@ app.get("/", function (req, res) {
           "<br>You're already logged with google!" +
           "<br>If you want, you can <button onclick='window.location.href=\"/logout/google\"'>logout</button> and try with another google account!" +
           "<br>Try your upload on <button onclick='window.location.href=\"/upload\"'>Drive</button>";
-
+    /*
     var twitterButton =
-      "<br>You can share also to <button onclick='window.location.href=\"/twitter/share\"'>Twitter</button>";
+      "<br>You can share also to <button onclick='window.location.href=\"/share/twitter\"'>Twitter</button>";*/
     res.send(
-      "This is the Homepage" +
+      "This is the sharing page" +
         googleButton +
-        twitterButton +
         "<br>You can return to the homepage <button onclick='window.location.href=\"/home/\"'>here</button>"
     );
   } else {
@@ -171,8 +171,7 @@ app.get("/upload", function (req, res) {
     );
   else {
     res.send(
-      "Uploading...<br>Meanwhile, return to the <button onclick='window.location.href=\"/home/
-      \"'>homepage</button>" +
+      "Uploading...<br>Meanwhile, return to the <button onclick='window.location.href=\"/home/\"'>homepage</button>" +
         " or to the <button onclick='window.location.href=\"/\"'>sharing page</button>"
     );
     var a_t = req.cookies.googleToken.token;
@@ -204,7 +203,7 @@ app.get("/logout/google", function (req, res) {
 /* ------------------ GOOGLE API ENDS ----------------------- */
 
 /* ------------------ TWITTER API START ----------------------- */
-
+/*
 app.get("/auth/twitter/error", (req, res) => {
   res.send("An error has occurred");
 });
@@ -236,7 +235,7 @@ app.post("/share/twitter", (req, res) => {
   tweet(image);
   res.send("tweeted with success");
 });
-
+*/
 /* ------------------ TWITTER API ENDS ----------------------- */
 
 /* --------------------- FACEBOOK API START ------------------ */
@@ -263,8 +262,6 @@ const bridge = new EventEmitter();
 
 /*--------------------- WEBSOCKET -------------------------*/
 
-// Colors for multicolor button
-let colors = ["blue", "red", "green", "violet", "yellow", "orange", "brown"];
 //Web socket handling
 const server = require("http").createServer(app);
 const wss = new websocket.Server({ server: server });
@@ -309,22 +306,7 @@ wss.on("connection", (ws) => {
         console.log("response backwarded to client");
       });
     } else {
-      if (mex.ok === true) {
-        //Send color
-        ws.send(JSON.stringify({ color: colors[ws.counter % colors.length] }));
-        ws.counter++;
-        // set repetitive sendigs
-        ws.streaming = setInterval(() => {
-          ws.send(
-            JSON.stringify({ color: colors[ws.counter % colors.length] })
-          );
-          ws.counter++;
-        }, 500);
-      }
-      if (mex.ok === false) {
-        // clear previous settings
-        clearInterval(ws.streaming);
-      } else if (mex.ok === undefined && mex.message !== undefined) {
+      if (mex.ok === undefined && mex.message !== undefined) {
         wss.clients.forEach((web_sock) => {
           if (web_sock !== ws) web_sock.send(data);
         });

@@ -24,6 +24,7 @@ async function FaceRec(firstSource, secondSource, encoding){
   const firstCtx = firstImg.getContext('2d');
   firstCtx.drawImage(firstImage, 0, 0, firstWidth, firstHeight);
 
+  //Stessa cosa per la seconda immagine
   const secondImage = await canvas.loadImage(secondSource);
   const secondSize = sizeOf(secondSource);
   const secondWidth = secondSize.width;

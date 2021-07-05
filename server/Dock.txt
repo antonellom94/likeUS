@@ -1,6 +1,0 @@
-docker build -t serverdiprova .             #Monta il server su docker in serverdiprova
-
-docker run -it -p 3000:3000 serverdiprova   #Avvia normalmente il server sulla porta 3000
-docker run -d -p 3000:3000 serverdiprova    #Fa lo stesso ma con detatch
-
-#Così non cambia dinamicamente, quindi bisogna rifare sempre le operazioni per montare l'app su docker
