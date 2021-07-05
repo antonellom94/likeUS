@@ -1,0 +1,27 @@
+{
+  "name": "facerec",
+  "version": "1.0.0",
+  "description": "Rest client for a face recognition service",
+  "main": "APIclient.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "node APIclient.js <first_image_name> <second_image_name> <result_image_path_name>"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/antonellom94/likeUS.git"
+  },
+  "keywords": [
+    "FaceRec"
+  ],
+  "author": "likeUs",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/antonellom94/likeUS/issues"
+  },
+  "homepage": "https://github.com/antonellom94/likeUS#readme",
+  "apidoc": {
+    "title": "FaceRecApi",
+    "url" : "http://localhost"
+  }
+}
