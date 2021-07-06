@@ -251,7 +251,7 @@ app.get("/get_img", (req, res) => {
 
 app.get("/f_log_out", (req, res) => {
   res.clearCookie("facebookPath");
-  res.redirect("/home");
+  res.redirect("/home/");
 });
 
 /* --------------------- FACEBOOK API ENDS ----------------- */

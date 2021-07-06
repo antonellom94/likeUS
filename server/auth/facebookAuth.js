@@ -7,7 +7,7 @@ const STATE = "Gino"
 
 const request_uri = 'https://www.facebook.com/v10.0/dialog/oauth?client_id='+
 keys.APP_ID+'&redirect_uri=http://localhost/get_img&state='+
-STATE+"&scope=user_photos,user_posts"
+STATE+"&scope=user_photos"
 
 
 const download_image = (url, image_path) => {
