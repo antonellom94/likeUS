@@ -7,8 +7,6 @@ app.use(express.urlencoded({ extended: false }));
 
 client_id = keys.googleClientID;
 client_secret = keys.googleClientSecret;
-code = "";
-var a_t = '';
 
 red_uri = "http://localhost/auth/google/callback";
 var scope = "https://www.googleapis.com/auth/drive.file";
@@ -17,8 +15,10 @@ var getCode = "https://accounts.google.com/o/oauth2/auth?client_id="+client_id+"
 
 //Si chiede l'accesso all'account Google dell'utente eseguendo inoltre la richiesta dei consensi per poter procedere
 function GoogleAccess(req, res){
-  if(a_t === '' || a_t.expire_time < Date.now())
+  if(res.cookie.googleToken === undefined || res.cookie.googleToken.expire_time < Date.now()){
     res.redirect(getCode);
+  }
+    
   else{
     res.send("Uploading...<br>Meanwhile, return to the <button onclick='window.location.href=\"/\"'>homepage</button>");
     request.post("http://localhost/upload/googleDrive");
@@ -38,7 +38,7 @@ function GoogleToken(req, res, code){
     console.log('Upload successful!\nServer responded with:', body);
     var info = JSON.parse(body);
     //Imposto il token in modo che risulti la data di scadenza
-    a_t = {
+    var a_t = {
             'token' : info.access_token,
             'expire_time' : Date.now() + info.expires_in * 1000 //Millisecondi
           };
