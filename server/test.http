@@ -1,5 +1,0 @@
-
-// TEST HOMEPAGE SERVER
-GET http://localhost:3000/
-
-POST https://api.twitter.com/oauth/authenticate
